@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.role.dto;
 
+import com.shifo.shifo_java.features.permission.Permission;
 import lombok.*;
 
 import java.time.Instant;
@@ -8,8 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class RoleDto {
 
     private Long id;
@@ -20,7 +19,7 @@ public class RoleDto {
 
     private String description;
 
-    private List<Long> permissionIds;
+    private List<Permission> permissions;
 
     private Instant createdAt;
 
