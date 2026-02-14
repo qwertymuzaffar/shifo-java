@@ -51,8 +51,9 @@ public class Patient {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(columnDefinition = "int default 1")
-    private Integer status = 1;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PatientStatus status;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;

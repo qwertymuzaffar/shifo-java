@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.patient.dto;
 
+import com.shifo.shifo_java.features.patient.PatientStatus;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -38,7 +39,7 @@ public class PatientDto {
 
     private LocalDate birthDate;
 
-    private Integer status;
+    private PatientStatus status;
 
     private BigDecimal balance;
 
