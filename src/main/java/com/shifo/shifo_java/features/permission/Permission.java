@@ -1,12 +1,19 @@
 package com.shifo.shifo_java.features.permission;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shifo.shifo_java.features.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
+
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "permissions")
@@ -14,6 +21,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@SQLDelete(sql = "UPDATE permissions SET deleted_at = now() WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class Permission {
 
     @Id
@@ -23,29 +33,30 @@ public class Permission {
     @Column(unique = true)
     private String slug;
 
-    @Column
     private String name;
 
-    @Column
+    @Column(length = 1000)
     private String description;
 
-    @Column(name = "parent_id")
-    private Long parentId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", insertable = false, updatable = false)
+    @JoinColumn(name = "parent_id")
     private Permission parent;
 
-    @OneToMany(mappedBy = "parent")
-    private List<Permission> children = new ArrayList<>();
-
-    @Column(name = "created_at", updatable = false)
-    private Instant createdAt = Instant.now();
-
-    @Column(name = "updated_at")
-    private Instant updatedAt = Instant.now();
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = false)
+    private Set<Permission> children = new HashSet<>();
 
     @ManyToMany(mappedBy = "permissions")
-    private List<Role> roles = new ArrayList<>();
-}
+    @JsonIgnore
+    private Set<Role> roles = new HashSet<>();
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+}

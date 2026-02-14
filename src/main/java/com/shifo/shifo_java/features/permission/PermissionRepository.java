@@ -4,14 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
-    @Query("""
-                SELECT p FROM Permission p
-                LEFT JOIN FETCH p.children
-                WHERE p.parentId IS NULL
-                ORDER BY p.slug
-            """)
-    List<Permission> findAllRootPermissions();
+    boolean existsBySlug(String slug);
+
+    Optional<Permission> findBySlug(String slug);
+
+    List<Permission> findBySlugIn(List<String> slugs);
 }
