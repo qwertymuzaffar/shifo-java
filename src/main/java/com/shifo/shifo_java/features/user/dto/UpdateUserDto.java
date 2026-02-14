@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.user.dto;
 
+import com.shifo.shifo_java.features.role.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -37,7 +38,7 @@ public class UpdateUserDto {
     @Schema(description = "User role", example = "admin", required = false)
     @Pattern(regexp = "admin|user", message = "Role must be either 'admin' or 'user'")
     @Nullable
-    private String role;
+    private Role role;
 
     @Schema(description = "Active status", example = "true", required = false)
     @Nullable

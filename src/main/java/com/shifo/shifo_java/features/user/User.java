@@ -1,11 +1,9 @@
 package com.shifo.shifo_java.features.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.shifo.shifo_java.features.role.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +15,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Table(name = "users")
+@Builder
 public class User {
 
     @Id
@@ -49,11 +48,8 @@ public class User {
                 (lastName == null ? "" : lastName)).trim();
     }
 
-    @Column(name = "role_id")
-    private Long roleId;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", insertable = false, updatable = false)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     @Column(nullable = false)

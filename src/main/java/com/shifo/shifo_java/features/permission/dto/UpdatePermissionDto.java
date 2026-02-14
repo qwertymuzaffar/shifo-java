@@ -1,4 +1,4 @@
-package com.shifo.shifo_java.features.role.dto;
+package com.shifo.shifo_java.features.permission.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
@@ -29,4 +29,6 @@ public class UpdatePermissionDto {
     @Size(max = 255, message = "Description must not exceed 255 characters")
     @Nullable
     private String description;
+
+    private Long parentId;
 }
