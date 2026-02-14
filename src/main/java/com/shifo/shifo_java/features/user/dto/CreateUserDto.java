@@ -42,6 +42,6 @@ public class CreateUserDto {
 
     @Schema(description = "User role ID", example = "1", required = false)
     @Min(value = 1, message = "roleId must be a positive integer")
-    private Integer roleId;
+    private Long roleId;
 }
 

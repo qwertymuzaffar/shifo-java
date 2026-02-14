@@ -1,5 +1,9 @@
 package com.shifo.shifo_java.features.doctor.dto;
 
+import com.shifo.shifo_java.features.specialization.Specialization;
+import com.shifo.shifo_java.features.specialization.dto.SpecializationDto;
+import com.shifo.shifo_java.features.user.User;
+import com.shifo.shifo_java.features.user.dto.UserDto;
 import lombok.*;
 
 import java.time.Instant;
@@ -13,20 +17,19 @@ public class DoctorDto {
 
     private Long id;
 
-    private Long userId;
+    private UserDto user;
 
     private Boolean isActive;
 
     private Integer status;
 
-    private Long specializationId;
+    private SpecializationDto specialization;
 
     private Integer experience;
 
     private Integer consultationFee;
 
-    // Store JSON string like {"start":"09:00","end":"17:00","workingDays":[1,2,3]}
-    private String workingHours;
+    private WorkingHoursDto workingHours;
 
     // Computed fields (matching @Transient fields)
     private String fullName;
@@ -37,4 +40,3 @@ public class DoctorDto {
 
     private Instant updatedAt;
 }
-

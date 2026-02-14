@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.Min;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,10 +19,10 @@ public class FilterPatientDto {
 
     // Birth date range (ISO format YYYY-MM-DD)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private String birthDateFrom;
+    private LocalDate birthDateFrom;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private String birthDateTo;
+    private LocalDate birthDateTo;
 
     // Pagination
     @Min(value = 1, message = "page must be >= 1")

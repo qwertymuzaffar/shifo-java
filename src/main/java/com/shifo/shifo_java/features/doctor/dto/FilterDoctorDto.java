@@ -16,12 +16,10 @@ public class FilterDoctorDto {
     private String search;
 
     // ID специализации
-    @Positive(message = "specializationId must be a positive number")
-    private Long specializationId;
+    @Positive(message = "specialization must be a positive number")
+    private Long specialization;
 
-    // ID комнаты
-    @Positive(message = "roomId must be a positive number")
-    private Long roomId;
+    private Long procedureId;
 
     // Фильтр по активности
     private Boolean isActive;

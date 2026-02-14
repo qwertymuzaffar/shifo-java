@@ -8,6 +8,8 @@ import com.shifo.shifo_java.features.patient.dto.TotalPatientsDto;
 import com.shifo.shifo_java.features.payment.dto.PaymentMethodStatsDto;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

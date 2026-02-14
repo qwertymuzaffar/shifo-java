@@ -1,4 +1,4 @@
-package com.shifo.shifo_java.features.role.dto;
+package com.shifo.shifo_java.features.permission.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -21,7 +21,7 @@ public class AssignPermissionsDto {
     private List<
             @NotNull(message = "Permission ID cannot be null")
             @Min(value = 1, message = "Permission ID must be a positive number")
-                    Integer
+                    Long
             > permissionIds;
 }
 

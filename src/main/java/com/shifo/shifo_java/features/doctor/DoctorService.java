@@ -1,208 +1,269 @@
 package com.shifo.shifo_java.features.doctor;
 
+import com.shifo.shifo_java.common.dto.PagedResponseDto;
 import com.shifo.shifo_java.common.exceptions.BadRequestException;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
+import com.shifo.shifo_java.features.doctor.dto.CreateDoctorDto;
 import com.shifo.shifo_java.features.doctor.dto.DoctorDto;
+import com.shifo.shifo_java.features.doctor.dto.FilterDoctorDto;
 import com.shifo.shifo_java.features.role.Role;
+import com.shifo.shifo_java.features.role.RoleRepository;
 import com.shifo.shifo_java.features.specialization.Specialization;
-import com.shifo.shifo_java.features.user.User;
-import com.shifo.shifo_java.common.exceptions.ResourceNotFoundException;
 import com.shifo.shifo_java.features.specialization.SpecializationRepository;
-import com.shifo.shifo_java.service.RbacService;
-import com.shifo.shifo_java.features.user.UserService;
-import jakarta.transaction.Transactional;
+import com.shifo.shifo_java.features.user.User;
+import com.shifo.shifo_java.features.user.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
-    private final UserService userService;
-    private final RbacService rbacService;
     private final SpecializationRepository specializationRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final MessageSource messageSource;
+    private final ObjectMapper objectMapper;
+    private final DoctorMapper doctorMapper;
 
-    // -----------------------------
-    // CREATE DOCTOR
-    // -----------------------------
-    @Transactional
-    public DoctorDto createDoctor(DoctorDto dto) {
+    @PersistenceContext
+    private EntityManager entityManager;
 
-        // 1. Check email
-        if (userService.existsByEmail(dto.getEmail())) {
-            throw new ResourceNotFoundException("Email already exists");
+    public Doctor create(CreateDoctorDto dto) {
+
+        // ----------------------------
+        // 1. Email uniqueness check
+        // ----------------------------
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new BadRequestException(
+                    translate("auth.errors.emailAlreadyInUse")
+            );
         }
 
-        // 2. Find doctor role
-        Role doctorRole = rbacService.findBySlug("doctor")
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor role not found"));
+        // ----------------------------
+        // 2. Username uniqueness check
+        // ----------------------------
+        if (dto.getUsername() != null &&
+                userRepository.existsByUsername(dto.getUsername())) {
 
-        // 3. Create user
+            throw new BadRequestException(
+                    translate("auth.errors.usernameAlreadyInUse")
+            );
+        }
+
+        // ----------------------------
+        // 3. Fetch doctor role
+        // ----------------------------
+        Role doctorRole = roleRepository.findBySlug("doctor")
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                translate("users.errors.invalidRole")
+                        )
+                );
+
+        // ----------------------------
+        // 4. Create User
+        // ----------------------------
         User user = new User();
-        user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
+        user.setUsername(dto.getUsername());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
-        user.setRoleId(doctorRole.getId());
-        userService.create(user, dto.getPassword());
+        user.setPassword(dto.getPassword()); // hashing assumed elsewhere
+        user.setRole(doctorRole);
 
-        // 4. Create doctor entity
+        userRepository.save(user);
+
+        // ----------------------------
+        // 5. Create Doctor
+        // ----------------------------
         Doctor doctor = new Doctor();
-        doctor.setUserId(user.getId());
-        doctor.setIsActive(dto.getIsActive());
-        doctor.setStatus(1);
-        doctor.setExperience(dto.getExperience());
-        doctor.setConsultationFee(dto.getConsultationFee());
-        doctor.setWorkingHours(dto.getWorkingHours());
+        doctor.setUser(user);
 
-        // set specialization
-        if (dto.getSpecializationId() != null) {
-            Specialization specialization = specializationRepository.findById(dto.getSpecializationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Specialization not found"));
-            doctor.setSpecialization(specialization);
+        Long specializationId;
+        try {
+            specializationId = Long.parseLong(dto.getSpecialization());
+        } catch (NumberFormatException ex) {
+            throw new BadRequestException("Invalid specialization id");
         }
 
-        doctorRepository.save(doctor);
+        Specialization specializationEntity = specializationRepository
+                .findById(specializationId)
+                .orElseThrow(() -> new NotFoundException("Specialization not found"));
 
-        return mapToDto(doctor);
+        if (specializationEntity.getId() != null) {
+            doctor.setSpecialization(specializationEntity);
+        }
+
+        doctor.setWorkingHours(dto.getWorkingHours());
+
+        doctor.setExperience(dto.getExperience());
+        doctor.setConsultationFee(dto.getConsultationFee());
+
+        // ----------------------------
+        // 6. Save Doctor
+        // ----------------------------
+        return doctorRepository.save(doctor);
     }
 
-    // -----------------------------
-    // FIND ALL WITH FILTERS
-    // -----------------------------
-    public Page<DoctorDto> findAll(DoctorFilterDto filterDto) {
-
-        Pageable pageable = PageRequest.of(
-                filterDto.getPage() - 1,
-                filterDto.getLimit(),
-                Sort.by("createdAt").descending()
+    // --------------------------------
+    // i18n helper (Nest i18n equivalent)
+    // --------------------------------
+    private String translate(String key) {
+        return messageSource.getMessage(
+                key,
+                null,
+                LocaleContextHolder.getLocale()
         );
+    }
 
-        Specification<Doctor> spec = Specification.where(DoctorSpec.statusIs(1));
+    @Transactional(readOnly = true)
+    public PagedResponseDto<DoctorDto> findAll(FilterDoctorDto filterDto) {
 
-        if (filterDto.getSearch() != null) {
-            spec = spec.and(DoctorSpec.search(filterDto.getSearch()));
+        int page = filterDto.getPage() != null ? filterDto.getPage() : 1;
+        int limit = filterDto.getLimit() != null ? filterDto.getLimit() : 10;
+        int offset = (page - 1) * limit;
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // =================================================
+        // Main query (items)
+        // =================================================
+        CriteriaQuery<Doctor> cq = cb.createQuery(Doctor.class);
+        Root<Doctor> doctor = cq.from(Doctor.class);
+
+        Join<Doctor, User> userJoin =
+                doctor.join("user", JoinType.LEFT);
+
+        Join<Doctor, Specialization> specializationJoin =
+                doctor.join("specialization", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        // Default filter: only active status = 1
+        predicates.add(cb.equal(doctor.get("status"), 1));
+
+        // Search (ILIKE equivalent)
+        if (filterDto.getSearch() != null && !filterDto.getSearch().isBlank()) {
+            String search = "%" + filterDto.getSearch().toLowerCase() + "%";
+
+            predicates.add(
+                    cb.or(
+                            cb.like(cb.lower(userJoin.get("firstName")), search),
+                            cb.like(cb.lower(userJoin.get("lastName")), search),
+                            cb.like(cb.lower(userJoin.get("phone")), search),
+                            cb.like(
+                                    cb.lower(
+                                            cb.concat(
+                                                    cb.concat(userJoin.get("firstName"), " "),
+                                                    cb.coalesce(userJoin.get("lastName"), "")
+                                            )
+                                    ),
+                                    search
+                            )
+                    )
+            );
+        }
+
+        // isActive filter
+        if (filterDto.getIsActive() != null) {
+            predicates.add(cb.equal(doctor.get("isActive"), filterDto.getIsActive()));
+        }
+
+        // specialization filter (frontend may send 0)
+        if (filterDto.getSpecialization() != null && filterDto.getSpecialization() > 0) {
+            predicates.add(
+                    cb.equal(specializationJoin.get("id"), filterDto.getSpecialization())
+            );
+        }
+
+        cq.where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.desc(doctor.get("createdAt")));
+
+        TypedQuery<Doctor> query = entityManager.createQuery(cq);
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+
+        List<Doctor> items = query.getResultList();
+
+        // =================================================
+        // Count query
+        // =================================================
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Doctor> countRoot = countQuery.from(Doctor.class);
+
+        Join<Doctor, User> countUserJoin =
+                countRoot.join("user", JoinType.LEFT);
+
+        Join<Doctor, Specialization> countSpecJoin =
+                countRoot.join("specialization", JoinType.LEFT);
+
+        List<Predicate> countPredicates = new ArrayList<>();
+
+        countPredicates.add(cb.equal(countRoot.get("status"), 1));
+
+        if (filterDto.getSearch() != null && !filterDto.getSearch().isBlank()) {
+            String search = "%" + filterDto.getSearch().toLowerCase() + "%";
+
+            countPredicates.add(
+                    cb.or(
+                            cb.like(cb.lower(countUserJoin.get("firstName")), search),
+                            cb.like(cb.lower(countUserJoin.get("lastName")), search),
+                            cb.like(cb.lower(countUserJoin.get("phone")), search),
+                            cb.like(
+                                    cb.lower(
+                                            cb.concat(
+                                                    cb.concat(countUserJoin.get("firstName"), " "),
+                                                    cb.coalesce(countUserJoin.get("lastName"), "")
+                                            )
+                                    ),
+                                    search
+                            )
+                    )
+            );
         }
 
         if (filterDto.getIsActive() != null) {
-            spec = spec.and(DoctorSpec.isActive(filterDto.getIsActive()));
+            countPredicates.add(cb.equal(countRoot.get("isActive"), filterDto.getIsActive()));
         }
 
-        if (filterDto.getSpecializationId() != null) {
-            spec = spec.and(DoctorSpec.specializationId(filterDto.getSpecializationId()));
+        if (filterDto.getSpecialization() != null && filterDto.getSpecialization() > 0) {
+            countPredicates.add(
+                    cb.equal(countSpecJoin.get("id"), filterDto.getSpecialization())
+            );
         }
 
-        if (filterDto.getRoomId() != null) {
-            spec = spec.and(DoctorSpec.roomId(filterDto.getRoomId()));
-        }
+        countQuery
+                .select(cb.countDistinct(countRoot))
+                .where(countPredicates.toArray(new Predicate[0]));
 
-        return doctorRepository.findAll(spec, pageable)
-                .map(this::mapToDto);
-    }
+        int total = Math.toIntExact(
+                entityManager.createQuery(countQuery).getSingleResult()
+        );
 
-    // -----------------------------
-    // FIND ONE
-    // -----------------------------
-    public DoctorDto findOne(Long id) {
-        Doctor doctor = doctorRepository.findActiveById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+        int totalPages = (int) Math.ceil((double) total / limit);
 
-        return mapToDto(doctor);
-    }
+        List<DoctorDto> doctorDtos = doctorMapper.toDtoList(items);
 
-    // -----------------------------
-    // UPDATE
-    // -----------------------------
-    @Transactional
-    public DoctorDto update(Long id, DoctorDto dto) {
-
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
-
-        // update user info
-        if (dto.getUsername() != null ||
-                dto.getEmail() != null ||
-                dto.getFirstName() != null) {
-            userService.update(doctor.getUserId(), dto);
-        }
-
-        // update specialization
-        if (dto.getSpecializationId() != null) {
-            Specialization specialization = specializationRepository
-                    .findById(dto.getSpecializationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Specialization not found"));
-            doctor.setSpecialization(specialization);
-        }
-
-        doctor.setExperience(dto.getExperience());
-        doctor.setConsultationFee(dto.getConsultationFee());
-        doctor.setWorkingHours(dto.getWorkingHours());
-
-        doctorRepository.save(doctor);
-
-        return mapToDto(doctor);
-    }
-
-    // -----------------------------
-    // REMOVE / SOFT DELETE
-    // -----------------------------
-    @Transactional
-    public void remove(Long id) {
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
-
-        doctor.setStatus(0); // soft delete
-        doctorRepository.save(doctor);
-
-        userService.remove(doctor.getUserId());
-    }
-
-    // -----------------------------
-    // UPDATE STATUS
-    // -----------------------------
-    @Transactional
-    public DoctorDto updateStatus(Long id, Integer status) {
-        if (status != 0 && status != 1) {
-            throw new BadRequestException("Status must be 0 or 1");
-        }
-
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
-
-        doctor.setStatus(status);
-        doctorRepository.save(doctor);
-
-        return mapToDto(doctor);
-    }
-
-    // -----------------------------
-    // MAP ENTITY TO DTO
-    // -----------------------------
-    private DoctorDto mapToDto(Doctor doctor) {
-        DoctorDto dto = new DoctorDto();
-
-        dto.setId(doctor.getId());
-        dto.setUserId(doctor.getUserId());
-        dto.setFullName(doctor.getFullName());
-        dto.setFirstName(doctor.getFirstName());
-        dto.setLastName(doctor.getLastName());
-        dto.setSpecializationId(doctor.getSpecialization() != null
-                ? doctor.getSpecialization().getId() : null);
-        dto.setExperience(doctor.getExperience());
-        dto.setConsultationFee(doctor.getConsultationFee());
-        dto.setWorkingHours(doctor.getWorkingHours());
-        dto.setIsActive(doctor.getIsActive());
-        dto.setStatus(doctor.getStatus());
-        dto.setCreatedAt(doctor.getCreatedAt());
-        dto.setUpdatedAt(doctor.getUpdatedAt());
-
-        return dto;
+        return PagedResponseDto.<DoctorDto>builder()
+                .items(doctorDtos)
+                .page(page)
+                .limit(limit)
+                .total(total)
+                .totalPages(totalPages)
+                .build();
     }
 }
-

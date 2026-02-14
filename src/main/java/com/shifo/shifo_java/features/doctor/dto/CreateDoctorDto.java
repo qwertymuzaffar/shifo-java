@@ -1,6 +1,5 @@
 package com.shifo.shifo_java.features.doctor.dto;
 
-import com.shifo.shifo_java.features.specialization.Specialization;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -18,42 +17,37 @@ public class CreateDoctorDto {
     private String lastName;
 
     @NotBlank(message = "Имя пользователя не может быть пустым")
-    @Size(min = 4, max = 100, message = "Имя пользователя должно содержать от 4 до 100 символов")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Имя пользователя может содержать только буквы, цифры и подчеркивания")
+    @Size(min = 4, max = 100)
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$")
     private String username;
 
     @NotBlank(message = "Email не может быть пустым")
-    @Email(message = "Некорректный формат email")
+    @Email
     private String email;
 
     @NotBlank(message = "Пароль не может быть пустым")
-    @Size(min = 8, max = 100, message = "Пароль должен содержать от 8 до 100 символов")
+    @Size(min = 8, max = 100)
     @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]+$",
-            message = "Пароль должен содержать как минимум одну заглавную букву, одну строчную букву и одну цифру"
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]+$"
     )
     private String password;
 
     @NotBlank(message = "Телефон не может быть пустым")
     @Pattern(
-            regexp = "^((\\+7|7)\\d{10}|(\\+998|998)\\d{9}|(\\+996|996)\\d{9}|(\\+992|992)\\d{9})$",
-            message = "Телефон должен быть валидным номером России, Узбекистана, Кыргызстана, Казахстана или Таджикистана"
+            regexp = "^((\\+7|7)\\d{10}|(\\+998|998)\\d{9}|(\\+996|996)\\d{9}|(\\+992|992)\\d{9})$"
     )
     private String phone;
 
     @NotNull(message = "Специализация обязательна")
-    private Specialization specialization;
+    @Positive(message = "specialization must be a positive number")
+    private String specialization;
 
-    private Long roomId;
+    private Boolean isActive;
 
     private Integer experience = 2;
-
     private Integer consultationFee = 100;
 
-    private WorkingHoursDto workingHours = new WorkingHoursDto(
-            "09:00",
-            "18:00",
-            java.util.List.of(1,2,3,4,5)
-    );
+    private WorkingHoursDto workingHours;
 }
+
 

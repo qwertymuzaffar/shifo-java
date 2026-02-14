@@ -1,15 +1,19 @@
 package com.shifo.shifo_java.features.doctor;
 
 import com.shifo.shifo_java.features.appointment.Appointment;
+import com.shifo.shifo_java.features.doctor.dto.WorkingHoursDto;
 import com.shifo.shifo_java.features.specialization.Specialization;
 import com.shifo.shifo_java.features.user.User;
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+import org.hibernate.type.SqlTypes;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +23,24 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "doctors")
+@Table(
+        name = "doctors",
+        indexes = {
+                @Index(name = "idx_doctors_is_active", columnList = "is_active"),
+                @Index(name = "idx_doctors_specialization_id", columnList = "specialization_id")
+        }
+)
+@SQLDelete(sql = "UPDATE doctors SET deleted_at = now() WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // user_id column + OneToOne relationship
-    @Column(name = "user_id")
-    private Long userId;
-
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Column(nullable = false)
@@ -45,27 +54,28 @@ public class Doctor {
     private Specialization specialization;
 
     @Column
-    private Integer experience; // years
+    private Integer experience;
 
     @Column
     private Integer consultationFee;
 
-    // JSON field → stored as TEXT or JSONB depending on DB
-    @Column(columnDefinition = "TEXT")
-    private String workingHours;
-    // store JSON string such as:
-    // {"start": "09:00", "end": "17:00", "workingDays": [1,2,3,4,5]}
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "working_hours")
+    private WorkingHoursDto workingHours;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "doctor")
     private List<Appointment> appointments = new ArrayList<>();
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     @Transient
     public String getFullName() {
@@ -75,11 +85,11 @@ public class Doctor {
 
     @Transient
     public String getFirstName() {
-        return (user != null) ? user.getFirstName() : "";
+        return user != null ? user.getFirstName() : "";
     }
 
     @Transient
     public String getLastName() {
-        return (user != null) ? user.getLastName() : "";
+        return user != null ? user.getLastName() : "";
     }
 }
