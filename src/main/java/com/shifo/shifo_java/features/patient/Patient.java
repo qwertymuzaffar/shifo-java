@@ -35,8 +35,7 @@ public class Patient {
     @Column(length = 255)
     private String address;
 
-    // Keep as JSON string; DB must support JSON column type (MySQL/MariaDB)
-    @Column(name = "emergency_contact", columnDefinition = "json")
+    @Column(name = "emergency_contact", columnDefinition = "text")
     private String emergencyContact;
 
     // Stored in a separate table patient_allergies
@@ -51,9 +50,9 @@ public class Patient {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PatientStatus status;
+    @Enumerated(EnumType.STRING)
+    private PatientStatus status = PatientStatus.ACTIVE;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;

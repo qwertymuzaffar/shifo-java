@@ -1,36 +1,27 @@
 package com.shifo.shifo_java.features.patient.dto;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreatePatientDto {
 
-    @Schema(
-            description = "Full name of the patient",
-            example = "John Doe"
-    )
     @NotBlank(message = "Полное имя не может быть пустым")
-    @Size(min = 2, max = 255, message = "Полное имя должно содержать от 2 до 255 символов")
+    @Size(min = 2, max = 255)
     private String fullName;
 
-    @Schema(
-            description = "Phone number (Tajikistan format)",
-            example = "+992901234567"
-    )
     @NotBlank(message = "Номер телефона не может быть пустым")
     @Pattern(
             regexp = "^(\\+992|992)?\\d{9}$",
@@ -38,21 +29,39 @@ public class CreatePatientDto {
     )
     private String phone;
 
-    @Schema(
-            description = "Address of the patient",
-            example = "Dushanbe, Rudaki Ave 123"
-    )
-    @Nullable
     @Size(max = 255)
     private String address;
 
-    @Schema(
-            description = "Birth date of the patient",
-            example = "1990-01-01"
-    )
     @NotNull(message = "Дата рождения не может быть пустой")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
+
+    private String emergencyContact;
+
+    @Setter(AccessLevel.NONE)
+    private String allergies;
+
+    @JsonSetter("allergies")
+    public void setAllergies(Object value) {
+        if (value == null) {
+            this.allergies = null;
+            return;
+        }
+
+        if (value instanceof String str) {
+            this.allergies = str;
+        } else if (value instanceof List<?> list) {
+            this.allergies = list.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", "));
+        } else {
+            throw new IllegalArgumentException("Invalid allergies format");
+        }
+    }
+
+    private String medicalHistory;
 }
+
+
 
 

@@ -31,18 +31,9 @@ public class PatientsService {
     // CREATE
     // ---------------------------------------------------------
     @Transactional
-    public PatientDto create(CreatePatientDto dto) {
-        Patient patient = new Patient();
-        patient.setFullName(dto.getFullName());
-        patient.setPhone(dto.getPhone());
-        patient.setAddress(dto.getAddress());
-        patient.setBirthDate(dto.getBirthDate());
-        patient.setStatus(PatientStatus.ACTIVE);
-        patient.setBalance(BigDecimal.ZERO);
-
-        patientRepository.save(patient);
-
-        return patientMapper.toDto(patient);
+    public Patient create(CreatePatientDto dto) {
+        Patient patient = patientMapper.toEntity(dto);
+        return patientRepository.save(patient);
     }
 
     // ---------------------------------------------------------
@@ -156,29 +147,7 @@ public class PatientsService {
                         "Пациент не найден: id=" + id
                 ));
 
-        if (dto.getFullName() != null) {
-            patient.setFullName(dto.getFullName());
-        }
-        if (dto.getPhone() != null) {
-            patient.setPhone(dto.getPhone());
-        }
-        if (dto.getAddress() != null) {
-            patient.setAddress(dto.getAddress());
-        }
-        if (dto.getEmergencyContact() != null) {
-            patient.setEmergencyContact(dto.getEmergencyContact());
-        }
-        if (dto.getAllergies() != null) {
-            patient.setAllergies(dto.getAllergies());
-        }
-        if (dto.getMedicalHistory() != null) {
-            patient.setMedicalHistory(dto.getMedicalHistory());
-        }
-        if (dto.getBirthDate() != null) {
-            patient.setBirthDate(dto.getBirthDate());
-        }
-
-        patientRepository.save(patient);
+        patientMapper.updateEntity(dto, patient);
 
         return patientMapper.toDto(patient);
     }

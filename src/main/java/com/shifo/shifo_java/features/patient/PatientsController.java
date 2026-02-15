@@ -32,8 +32,8 @@ public class PatientsController {
             @ApiResponse(responseCode = "201", description = "Пациент успешно создан"),
             @ApiResponse(responseCode = "400", description = "Неверные данные")
     })
-    public ResponseEntity<PatientDto> create(@Valid @RequestBody CreatePatientDto createPatientDto) {
-        PatientDto patient = patientsService.create(createPatientDto);
+    public ResponseEntity<Patient> create(@Valid @RequestBody CreatePatientDto createPatientDto) {
+        Patient patient = patientsService.create(createPatientDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient);
     }
 

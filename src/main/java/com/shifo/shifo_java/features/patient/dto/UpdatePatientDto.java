@@ -55,7 +55,7 @@ public class UpdatePatientDto {
             example = "[\"Penicillin\", \"Peanuts\"]"
     )
     @Nullable
-    private List<String> allergies;
+    private String allergies;
 
     @Schema(
             description = "Medical history notes"
