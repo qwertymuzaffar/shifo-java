@@ -3,6 +3,7 @@ package com.shifo.shifo_java.features.appointment;
 import com.shifo.shifo_java.common.enums.AppointmentStatus;
 import com.shifo.shifo_java.common.enums.AppointmentType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -76,19 +77,32 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findAllByDateWithRelations(@Param("date") LocalDate date);
 
     @Query("""
-        SELECT COUNT(a)
-        FROM Appointment a
-        WHERE a.date BETWEEN :dateFrom AND :dateTo
-          AND (:doctorIds IS NULL OR a.doctor.id IN :doctorIds)
-          AND (:types IS NULL OR a.type IN :types)
-          AND (:status IS NULL OR a.status = :status)
-        """)
+            SELECT COUNT(a)
+            FROM Appointment a
+            WHERE a.date BETWEEN :dateFrom AND :dateTo
+              AND (:doctorIds IS NULL OR a.doctor.id IN :doctorIds)
+              AND (:types IS NULL OR a.type IN :types)
+              AND (:status IS NULL OR a.status = :status)
+            """)
     long countByDateRangeAndFilters(
             @Param("dateFrom") LocalDate dateFrom,
             @Param("dateTo") LocalDate dateTo,
             @Param("doctorIds") List<Long> doctorIds,
             @Param("types") List<AppointmentType> types,
             @Param("status") AppointmentStatus status
+    );
+
+    @Modifying
+    @Query("""
+                UPDATE Appointment a
+                SET a.status = :cancelledStatus
+                WHERE a.doctor.id = :doctorId
+                  AND a.status IN :statuses
+            """)
+    int cancelFutureAppointments(
+            @Param("doctorId") Long doctorId,
+            @Param("statuses") List<AppointmentStatus> statuses,
+            @Param("cancelledStatus") AppointmentStatus cancelledStatus
     );
 }
 
