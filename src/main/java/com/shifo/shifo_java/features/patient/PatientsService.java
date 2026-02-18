@@ -1,6 +1,7 @@
 package com.shifo.shifo_java.features.patient;
 
 import com.shifo.shifo_java.common.dto.PagedResponseDto;
+import com.shifo.shifo_java.common.enums.SortOrder;
 import com.shifo.shifo_java.common.exceptions.ResourceNotFoundException;
 import com.shifo.shifo_java.features.patient.dto.CreatePatientDto;
 import com.shifo.shifo_java.features.patient.dto.FilterPatientDto;
@@ -39,32 +40,28 @@ public class PatientsService {
     // ---------------------------------------------------------
     // FIND ALL WITH FILTERS
     // ---------------------------------------------------------
-    public PagedResponseDto<PatientDto> findAll(FilterPatientDto filterDto) {
+    public PagedResponseDto<PatientDto> findAll(FilterPatientDto filter) {
 
-        String search = filterDto.getSearch();
-        LocalDate birthDateFrom = filterDto.getBirthDateFrom();
-        LocalDate birthDateTo = filterDto.getBirthDateTo();
-
-        int page = filterDto.getPage() != null ? filterDto.getPage() : 1;
-        int limit = filterDto.getLimit() != null ? filterDto.getLimit() : 10;
-        int skip = (page - 1) * limit;
+        int page = filter.getPage() != null ? filter.getPage() : 1;
+        int limit = filter.getLimit() != null ? filter.getLimit() : 10;
+        int offset = (page - 1) * limit;
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         /* ---------- ITEMS QUERY ---------- */
 
         CriteriaQuery<Patient> itemsQuery = cb.createQuery(Patient.class);
-        Root<Patient> itemsRoot = itemsQuery.from(Patient.class);
+        Root<Patient> root = itemsQuery.from(Patient.class);
 
-        List<Predicate> itemsPredicates =
-                buildPredicates(cb, itemsRoot, search, birthDateFrom, birthDateTo);
+        Predicate predicate = PatientSpecifications.build(filter)
+                .toPredicate(root, itemsQuery, cb);
 
-        itemsQuery
-                .where(itemsPredicates.toArray(new Predicate[0]))
-                .orderBy(cb.desc(itemsRoot.get("createdAt")));
+        itemsQuery.where(predicate);
+
+        applySorting(filter, cb, itemsQuery, root);
 
         List<Patient> items = entityManager.createQuery(itemsQuery)
-                .setFirstResult(skip)
+                .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
 
@@ -73,29 +70,48 @@ public class PatientsService {
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Patient> countRoot = countQuery.from(Patient.class);
 
-        List<Predicate> countPredicates =
-                buildPredicates(cb, countRoot, search, birthDateFrom, birthDateTo);
+        Predicate countPredicate = PatientSpecifications.build(filter)
+                .toPredicate(countRoot, countQuery, cb);
 
         Long total = entityManager.createQuery(
-                        countQuery
-                                .select(cb.count(countRoot))
-                                .where(countPredicates.toArray(new Predicate[0]))
-                )
-                .getSingleResult();
+                countQuery.select(cb.count(countRoot)).where(countPredicate)
+        ).getSingleResult();
 
-        /* ---------- MAPPING ---------- */
+        /* ---------- RESPONSE ---------- */
 
-        List<PatientDto> patientDtos = patientMapper.toDtoList(items);
-
+        List<PatientDto> dtos = patientMapper.toDtoList(items);
         int totalPages = (int) Math.ceil((double) total / limit);
 
         return PagedResponseDto.<PatientDto>builder()
-                .items(patientDtos)
+                .items(dtos)
                 .page(page)
                 .limit(limit)
                 .total(total)
                 .totalPages(totalPages)
                 .build();
+    }
+
+    private void applySorting(
+            FilterPatientDto filter,
+            CriteriaBuilder cb,
+            CriteriaQuery<?> query,
+            Root<Patient> root
+    ) {
+
+        if (filter.getSort() == null) {
+            query.orderBy(cb.desc(root.get("createdAt")));
+            return;
+        }
+
+        String field = switch (filter.getSort()) {
+            case BALANCE -> "balance";
+            case FULLNAME -> "lastName";
+            case LAST_VISIT_DATE -> "lastVisitDate";
+        };
+
+        boolean asc = filter.getOrder() == SortOrder.ASC;
+
+        query.orderBy(asc ? cb.asc(root.get(field)) : cb.desc(root.get(field)));
     }
 
     private List<Predicate> buildPredicates(
