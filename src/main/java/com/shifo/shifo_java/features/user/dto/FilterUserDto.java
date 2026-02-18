@@ -2,28 +2,26 @@ package com.shifo.shifo_java.features.user.dto;
 
 import com.shifo.shifo_java.common.dto.PaginationDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
 public class FilterUserDto extends PaginationDto {
 
-    @Schema(description = "Search by name", required = false)
-    @Nullable
+    @Schema(description = "Поиск по имени")
     private String search;
 
-    @Schema(description = "Search by role ID", example = "1", required = false)
-    @Nullable
-    private Integer roleId;
+    @Schema(description = "Поиск по роли")
+    @Min(value = 1, message = "roleId должен быть больше 0")
+    private Long roleId;
 
-    @Schema(description = "Filter by active status", example = "true", required = false)
-    @Nullable
+    @Schema(description = "Фильтр по статусу активности")
     private Boolean isActive;
 
-    @Schema(description = "Search by email", required = false)
-    @Nullable
+    @Schema(description = "Поиск по email")
     private String email;
 }
+
 

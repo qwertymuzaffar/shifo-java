@@ -9,39 +9,42 @@ import lombok.Setter;
 @Setter
 public class CreateUserDto {
 
-    @Schema(description = "Username (login)", example = "user123")
-    @NotBlank(message = "Username cannot be empty")
-    @Size(min = 4, max = 100, message = "Username must contain between 4 and 100 characters")
-    @Pattern(
-            regexp = "^[a-zA-Z0-9_]+$",
-            message = "Username may contain only letters, digits, and underscores"
-    )
+    @Schema(description = "Имя пользователя (логин)", example = "user123")
+    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @Size(min = 4, max = 100, message = "Имя пользователя должно содержать от 4 до 100 символов")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$",
+            message = "Имя пользователя может содержать только буквы, цифры и подчеркивания")
     private String username;
 
-    @Schema(description = "First name", example = "Иван", required = false)
-    @Size(min = 2, max = 50, message = "First name must contain between 2 and 50 characters")
+
+    @Schema(description = "Имя пользователя", example = "Иван")
+    @Size(min = 2, max = 50, message = "Имя должно содержать от 2 до 50 символов")
     private String firstName;
 
-    @Schema(description = "Last name", example = "Иванов", required = false)
-    @Size(min = 2, max = 50, message = "Last name must contain between 2 and 50 characters")
+
+    @Schema(description = "Фамилия пользователя", example = "Иванов")
+    @Size(min = 2, max = 50, message = "Фамилия должна содержать от 2 до 50 символов")
     private String lastName;
 
-    @Schema(description = "User email", example = "user@example.com")
-    @NotBlank(message = "Email cannot be empty")
-    @Email(message = "Invalid email format")
+
+    @Schema(description = "Email пользователя", example = "user@example.com")
+    @NotBlank(message = "Email не может быть пустым")
+    @Email(message = "Некорректный формат email")
     private String email;
 
-    @Schema(description = "User password", example = "P@ssw0rd123")
-    @NotBlank(message = "Password cannot be empty")
-    @Size(min = 8, max = 100, message = "Password must contain between 8 and 100 characters")
+
+    @Schema(description = "Пароль пользователя", example = "P@ssw0rd123")
+    @NotBlank(message = "Пароль не может быть пустым")
+    @Size(min = 8, max = 100, message = "Пароль должен содержать от 8 до 100 символов")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]+$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter, and one digit"
+            message = "Пароль должен содержать как минимум одну заглавную букву, одну строчную букву и одну цифру"
     )
     private String password;
 
-    @Schema(description = "User role ID", example = "1", required = false)
-    @Min(value = 1, message = "roleId must be a positive integer")
+
+    @Schema(description = "ID роли пользователя", example = "1")
+    @Min(value = 1, message = "roleId должен быть больше 0")
     private Long roleId;
 }
 
