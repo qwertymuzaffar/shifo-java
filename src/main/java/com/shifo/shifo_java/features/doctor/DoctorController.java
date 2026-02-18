@@ -4,6 +4,7 @@ import com.shifo.shifo_java.common.dto.PagedResponseDto;
 import com.shifo.shifo_java.features.doctor.dto.CreateDoctorDto;
 import com.shifo.shifo_java.features.doctor.dto.DoctorDto;
 import com.shifo.shifo_java.features.doctor.dto.FilterDoctorDto;
+import com.shifo.shifo_java.features.doctor.dto.UpdateDoctorDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,5 +42,39 @@ public class DoctorController {
     @Operation(summary = "Получить всех врачей с фильтрацией и пагинацией")
     public PagedResponseDto<DoctorDto> findAll(@Valid FilterDoctorDto filterDto) {
         return doctorService.findAll(filterDto);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Получить врача по ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Информация о враче"),
+            @ApiResponse(responseCode = "404", description = "Врач не найден")
+    })
+    public DoctorDto findOne(@PathVariable Long id) {
+        return doctorService.findOne(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Деактивировать (мягкое удаление) врача")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Врач деактивирован"),
+            @ApiResponse(responseCode = "404", description = "Врач не найден")
+    })
+    public void remove(@PathVariable Long id) {
+        doctorService.remove(id);
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "Обновить данные врача")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Врач успешно обновлен"),
+            @ApiResponse(responseCode = "404", description = "Врач не найден"),
+            @ApiResponse(responseCode = "400", description = "Неверные данные")
+    })
+    public DoctorDto update(
+            @PathVariable Long id,
+            @RequestBody UpdateDoctorDto dto
+    ) {
+        return doctorService.update(id, dto);
     }
 }

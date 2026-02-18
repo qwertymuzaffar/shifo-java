@@ -40,7 +40,7 @@ public class CreateDoctorDto {
 
     @NotNull(message = "Специализация обязательна")
     @Positive(message = "specialization must be a positive number")
-    private String specialization;
+    private Long specializationId;
 
     private Boolean isActive;
 

@@ -1,24 +1,33 @@
 package com.shifo.shifo_java.features.doctor.dto;
 
-import com.shifo.shifo_java.features.specialization.Specialization;
-import com.shifo.shifo_java.features.user.dto.UpdateUserDto;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
+import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class UpdateDoctorDto extends UpdateUserDto {
+import java.math.BigDecimal;
 
-    private Specialization specialization;
+@Getter
+@Setter
+public class UpdateDoctorDto {
 
+    // ---------------- USER FIELDS ----------------
+
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private String email;
+    private String password;
+
+    // add any other updatable User fields here
+
+
+    // ---------------- DOCTOR FIELDS ----------------
+
+    private Long specializationId;
     private Long roomId;
-
     private Integer experience;
-
     private Integer consultationFee;
 
+    @Valid
     private WorkingHoursDto workingHours;
 }
-

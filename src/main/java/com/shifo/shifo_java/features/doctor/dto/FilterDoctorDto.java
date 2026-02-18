@@ -1,34 +1,29 @@
 package com.shifo.shifo_java.features.doctor.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import jakarta.validation.constraints.Min;
+import com.shifo.shifo_java.common.dto.PaginationDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Positive;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class FilterDoctorDto {
+@Getter
+@Setter
+@Schema(description = "Фильтр для поиска врачей")
+public class FilterDoctorDto extends PaginationDto {
 
-    // Поиск по телефону
+    @Schema(description = "Поиск по номеру телефона", example = "99890")
     private String search;
 
-    // ID специализации
-    @Positive(message = "specialization must be a positive number")
-    private Long specialization;
+    @Schema(description = "ID специализации", example = "3")
+    @Positive(message = "specializationId должен быть положительным числом")
+    private Long specializationId;
 
-    private Long procedureId;
+    @Schema(description = "ID комнаты", example = "5")
+    @Positive(message = "roomId должен быть положительным числом")
+    private Long roomId;
 
-    // Фильтр по активности
+    @Schema(description = "Фильтр по статусу активности", example = "true")
     private Boolean isActive;
-
-    // Pagination
-    @Min(value = 1, message = "page must be >= 1")
-    private Integer page = 1;
-
-    @Min(value = 1, message = "limit must be >= 1")
-    private Integer limit = 10;
 }
+
 
