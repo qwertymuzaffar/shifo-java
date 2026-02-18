@@ -6,17 +6,25 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "users")
 @Getter
 @Setter
-@Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class User {
+
+    private static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +39,7 @@ public class User {
     @Column(length = 100)
     private String phone;
 
-    @JsonIgnore
+    @JsonIgnore // equivalent to @Exclude()
     @Column(nullable = false)
     private String password;
 
@@ -41,16 +49,19 @@ public class User {
     @Column(length = 100)
     private String lastName;
 
-    // Computed field (like @Expose)
-    @Transient
-    public String getFullName() {
-        return ((firstName == null ? "" : firstName) + " " +
-                (lastName == null ? "" : lastName)).trim();
-    }
-
+    /**
+     * Many users → one role
+     */
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id")
     private Role role;
+
+    /**
+     * If you still want direct access to roleId (like in TypeORM)
+     * mark it insertable=false/updatable=false so JPA doesn't fight relationship.
+     */
+    @Column(name = "role_id", insertable = false, updatable = false)
+    private Long roleId;
 
     @Column(nullable = false)
     private Boolean isActive = true;
@@ -66,12 +77,33 @@ public class User {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
-    public void hashPassword(String rawPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
-        this.password = encoder.encode(rawPassword);
+    // -------------------------
+    // Derived field (like @Expose get fullName)
+    // -------------------------
+    @Transient
+    public String getFullName() {
+        String first = firstName == null ? "" : firstName;
+        String last = lastName == null ? "" : lastName;
+        return (first + " " + last).trim();
     }
 
-    public boolean validatePassword(String rawPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
-        return encoder.matches(rawPassword, this.password);
+    // -------------------------
+    // Password hashing (BeforeInsert equivalent)
+    // -------------------------
+    @PrePersist
+    @PreUpdate
+    private void hashPassword() {
+        if (password != null && !password.startsWith("$2a$")) {
+            this.password = PASSWORD_ENCODER.encode(this.password);
+        }
+    }
+
+    // -------------------------
+    // Password validation helper
+    // -------------------------
+    public boolean validatePassword(String rawPassword) {
+        return PASSWORD_ENCODER.matches(rawPassword, this.password);
     }
 }
+
 

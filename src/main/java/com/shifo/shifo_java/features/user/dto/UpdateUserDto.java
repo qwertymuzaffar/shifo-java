@@ -11,40 +11,38 @@ import org.springframework.lang.Nullable;
 @Setter
 public class UpdateUserDto {
 
-    @Schema(description = "New email", example = "new.email@example.com", required = false)
-    @Email(message = "Invalid email format")
-    @Nullable
+    @Schema(description = "Email пользователя", example = "new.email@example.com")
+    @Email(message = "Некорректный формат email")
     private String email;
 
-    @Schema(description = "First name", example = "Иван", required = false)
-    @Size(min = 2, max = 50, message = "First name must contain between 2 and 50 characters")
-    @Nullable
+
+    @Schema(description = "Имя пользователя", example = "Иван")
+    @Size(min = 2, max = 50, message = "Имя должно содержать от 2 до 50 символов")
     private String firstName;
 
-    @Schema(description = "Last name", example = "Иванов", required = false)
-    @Size(min = 2, max = 50, message = "Last name must contain between 2 and 50 characters")
-    @Nullable
+
+    @Schema(description = "Фамилия пользователя", example = "Иванов")
+    @Size(min = 2, max = 50, message = "Фамилия должна содержать от 2 до 50 символов")
     private String lastName;
 
-    @Schema(description = "New password", example = "NewP@ssw0rd123", required = false)
-    @Size(min = 8, max = 100, message = "Password must contain between 8 and 100 characters")
+
+    @Schema(description = "Новый пароль пользователя", example = "NewP@ssw0rd123")
+    @Size(min = 8, max = 100, message = "Пароль должен содержать от 8 до 100 символов")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]+$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter, and one digit"
+            message = "Пароль должен содержать как минимум одну заглавную букву, одну строчную букву и одну цифру"
     )
-    @Nullable
     private String password;
 
-    @Nullable
+    @Schema(description = "Номер телефона пользователя", example = "+992900123456")
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Некорректный формат номера телефона")
     private String phone;
 
-    @Schema(description = "User role", example = "admin", required = false)
-    @Pattern(regexp = "admin|user", message = "Role must be either 'admin' or 'user'")
-    @Nullable
+    @Schema(description = "Роль пользователя", allowableValues = {"admin", "user"})
+    @Pattern(regexp = "admin|user", message = "Роль должна быть либо admin, либо user")
     private Role role;
 
-    @Schema(description = "Active status", example = "true", required = false)
-    @Nullable
+    @Schema(description = "Статус активности пользователя")
     private Boolean isActive;
 }
 

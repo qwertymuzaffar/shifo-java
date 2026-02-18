@@ -1,13 +1,18 @@
 package com.shifo.shifo_java.features.user;
 
+import com.shifo.shifo_java.common.dto.PagedResponseDto;
+import com.shifo.shifo_java.features.user.dto.FilterUserDto;
 import com.shifo.shifo_java.features.user.dto.UpdateUserDto;
 import com.shifo.shifo_java.features.user.dto.UserDto;
+import com.shifo.shifo_java.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -87,5 +92,23 @@ public class UserService {
                     "users.errors.notFound"
             );
         }
+    }
+
+    public PagedResponseDto<UserDto> findAll(FilterUserDto filterDto) {
+
+        PagedResponseDto<User> page = userRepository.findAllWithFilter(filterDto);
+
+        List<UserDto> mapped = page.getItems()
+                .stream()
+                .map(userMapper::mapUserToDto)
+                .toList();
+
+        return PagedResponseDto.<UserDto>builder()
+                .items(mapped)
+                .page(page.getPage())
+                .limit(page.getLimit())
+                .total(page.getTotal())
+                .totalPages(page.getTotalPages())
+                .build();
     }
 }
