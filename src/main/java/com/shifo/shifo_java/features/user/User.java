@@ -63,6 +63,9 @@ public class User {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
     public void hashPassword(String rawPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
         this.password = encoder.encode(rawPassword);
     }

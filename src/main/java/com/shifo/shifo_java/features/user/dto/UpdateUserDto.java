@@ -35,6 +35,9 @@ public class UpdateUserDto {
     @Nullable
     private String password;
 
+    @Nullable
+    private String phone;
+
     @Schema(description = "User role", example = "admin", required = false)
     @Pattern(regexp = "admin|user", message = "Role must be either 'admin' or 'user'")
     @Nullable

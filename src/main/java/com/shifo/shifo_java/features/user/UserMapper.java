@@ -1,5 +1,7 @@
 package com.shifo.shifo_java.features.user;
 
+import com.shifo.shifo_java.features.doctor.dto.UpdateDoctorDto;
+import com.shifo.shifo_java.features.user.dto.UpdateUserDto;
 import com.shifo.shifo_java.features.user.dto.UserDto;
 import org.springframework.stereotype.Component;
 
@@ -23,5 +25,26 @@ public class UserMapper {
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
         return dto;
+    }
+
+    public UpdateUserDto fromDoctorUpdate(UpdateDoctorDto dto) {
+
+        UpdateUserDto userDto = new UpdateUserDto();
+
+        userDto.setFirstName(dto.getFirstName());
+        userDto.setLastName(dto.getLastName());
+        userDto.setPhone(dto.getPhone());
+        userDto.setEmail(dto.getEmail());
+        userDto.setPassword(dto.getPassword());
+
+        return userDto;
+    }
+
+    public boolean hasUserChanges(UpdateDoctorDto dto) {
+        return dto.getFirstName() != null ||
+                dto.getLastName() != null ||
+                dto.getPhone() != null ||
+                dto.getEmail() != null ||
+                dto.getPassword() != null;
     }
 }
