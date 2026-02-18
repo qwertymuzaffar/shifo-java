@@ -9,7 +9,7 @@ import com.shifo.shifo_java.features.user.User;
 import com.shifo.shifo_java.common.exceptions.ConflictException;
 import com.shifo.shifo_java.common.exceptions.UnauthorizedException;
 import com.shifo.shifo_java.features.role.RoleRepository;
-import com.shifo.shifo_java.features.user.UserRepository;
+import com.shifo.shifo_java.features.user.repository.UserRepository;
 import com.shifo.shifo_java.security.JwtService;
 import com.shifo.shifo_java.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;

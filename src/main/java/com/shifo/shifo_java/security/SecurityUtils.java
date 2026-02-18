@@ -1,7 +1,7 @@
 package com.shifo.shifo_java.security;
 
 import com.shifo.shifo_java.features.user.User;
-import com.shifo.shifo_java.features.user.UserRepository;
+import com.shifo.shifo_java.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

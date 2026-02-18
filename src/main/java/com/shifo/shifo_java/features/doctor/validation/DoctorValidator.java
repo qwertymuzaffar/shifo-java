@@ -2,7 +2,7 @@ package com.shifo.shifo_java.features.doctor.validation;
 
 import com.shifo.shifo_java.common.exceptions.BadRequestException;
 import com.shifo.shifo_java.features.doctor.dto.CreateDoctorDto;
-import com.shifo.shifo_java.features.user.UserRepository;
+import com.shifo.shifo_java.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

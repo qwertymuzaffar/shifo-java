@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.config;
 
+import com.shifo.shifo_java.features.user.repository.UserRepository;
 import com.shifo.shifo_java.security.JwtAuthenticationEntryPoint;
 import com.shifo.shifo_java.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final com.shifo.shifo_java.features.user.UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
