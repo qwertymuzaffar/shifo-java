@@ -184,6 +184,10 @@ public class PatientsService {
     @Transactional
     public PatientDto updateStatus(Long id, PatientStatus status) {
 
+        if (status == null) {
+            throw new IllegalArgumentException("Status required");
+        }
+
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Пациент не найден: id=" + id

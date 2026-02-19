@@ -9,6 +9,5 @@ import lombok.Setter;
 @Setter
 public class UpdatePatientStatusDto {
 
-    @NotNull
     private PatientStatus status;
 }
