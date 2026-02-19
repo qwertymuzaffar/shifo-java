@@ -111,4 +111,16 @@ public class UserService {
                 .totalPages(page.getTotalPages())
                 .build();
     }
+
+    public UserDto findOne(Long id) {
+        User user = userRepository.findByIdWithRole(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User not found with id = " + id
+                        )
+                );
+
+        return userMapper.mapUserToDto(user);
+    }
 }

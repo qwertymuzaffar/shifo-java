@@ -5,15 +5,14 @@ import com.shifo.shifo_java.common.dto.PaginationDto;
 import com.shifo.shifo_java.features.user.dto.FilterUserDto;
 import com.shifo.shifo_java.features.user.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -35,4 +34,37 @@ public class UserController {
     public ResponseEntity<PagedResponseDto<UserDto>> findAll(FilterUserDto filterDto) {
         return ResponseEntity.ok(usersService.findAll(filterDto));
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Получить пользователя по ID (только для админа)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Информация о пользователе"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
+    public ResponseEntity<UserDto> findOne(
+            @Parameter(description = "ID пользователя")
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(usersService.findOne(id));
+    }
+
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить пользователя (только для админа)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно удален"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID пользователя")
+            @PathVariable Long id
+    ) {
+        usersService.remove(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

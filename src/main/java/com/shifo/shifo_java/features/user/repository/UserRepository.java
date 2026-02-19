@@ -1,10 +1,7 @@
 package com.shifo.shifo_java.features.user.repository;
 
 import com.shifo.shifo_java.features.user.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -25,5 +22,13 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
                 WHERE u.id = :id AND u.deletedAt IS NULL
             """)
     int softDelete(@Param("id") Long id);
+
+    @Query("""
+            SELECT u
+            FROM User u
+            LEFT JOIN FETCH u.role
+            WHERE u.id = :id
+            """)
+    Optional<User> findByIdWithRole(@Param("id") Long id);
 
 }

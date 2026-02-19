@@ -2,8 +2,12 @@ package com.shifo.shifo_java.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
+@Getter
+@NoArgsConstructor
 public class PaginationDto {
 
     @Schema(
@@ -26,17 +30,9 @@ public class PaginationDto {
     @Nullable
     private Integer limit = 10;
 
-    // ===== Getters / Setters =====
-    public Integer getPage() {
-        return page;
-    }
-
+    // We KEEP custom setters because they normalize null values
     public void setPage(Integer page) {
         this.page = (page == null ? 1 : page);
-    }
-
-    public Integer getLimit() {
-        return limit;
     }
 
     public void setLimit(Integer limit) {
