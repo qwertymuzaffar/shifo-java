@@ -7,14 +7,27 @@ import com.shifo.shifo_java.features.appointment.model.Appointment;
 import com.shifo.shifo_java.features.appointment.model.AppointmentStatus;
 import com.shifo.shifo_java.features.appointment.model.AppointmentType;
 import com.shifo.shifo_java.features.doctor.Doctor;
+import com.shifo.shifo_java.features.doctor.DoctorMapper;
 import com.shifo.shifo_java.features.patient.Patient;
+import com.shifo.shifo_java.features.patient.PatientMapper;
 import com.shifo.shifo_java.features.procedure.Procedure;
+import com.shifo.shifo_java.features.procedure.ProcedureMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class AppointmentMapper {
+
+    private final DoctorMapper doctorMapper;
+    private final PatientMapper patientMapper;
+    private final ProcedureMapper procedureMapper;
+
+    public AppointmentMapper(DoctorMapper doctorMapper, PatientMapper patientMapper, ProcedureMapper procedureMapper) {
+        this.doctorMapper = doctorMapper;
+        this.patientMapper = patientMapper;
+        this.procedureMapper = procedureMapper;
+    }
 
     public Appointment toEntity(
             CreateAppointmentDto dto,
@@ -62,11 +75,11 @@ public class AppointmentMapper {
 
         // Relations → expose only IDs (avoid lazy loading serialization issues)
         if (entity.getDoctor() != null) {
-            dto.setDoctorId(entity.getDoctor().getId());
+            dto.setDoctor(doctorMapper.toDto(entity.getDoctor()));
         }
 
         if (entity.getPatient() != null) {
-            dto.setPatientId(entity.getPatient().getId());
+            dto.setPatient(patientMapper.toDto(entity.getPatient()));
         }
 
         dto.setDuration(entity.getDuration());
@@ -81,10 +94,10 @@ public class AppointmentMapper {
 
         // ManyToMany → IDs only
         if (entity.getProcedures() != null && !entity.getProcedures().isEmpty()) {
-            dto.setProcedureIds(
+            dto.setProcedures(
                     entity.getProcedures()
                             .stream()
-                            .map(Procedure::getId)
+                            .map(procedureMapper::toDto)
                             .toList()
             );
         }

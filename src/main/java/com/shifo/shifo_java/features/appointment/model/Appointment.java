@@ -82,7 +82,7 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AppointmentType type = AppointmentType.CONSULTATION;
+    private AppointmentType type;
 
     @ManyToMany
     @JoinTable(

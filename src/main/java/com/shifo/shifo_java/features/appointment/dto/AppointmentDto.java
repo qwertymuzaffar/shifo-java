@@ -8,6 +8,9 @@ import java.util.List;
 
 import com.shifo.shifo_java.features.appointment.model.AppointmentStatus;
 import com.shifo.shifo_java.features.appointment.model.AppointmentType;
+import com.shifo.shifo_java.features.doctor.dto.DoctorDto;
+import com.shifo.shifo_java.features.patient.dto.PatientDto;
+import com.shifo.shifo_java.features.procedure.dto.ProcedureDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +28,9 @@ public class AppointmentDto {
 
     private LocalDate date;
 
-    private Long doctorId;
+    private DoctorDto doctor;
 
-    private Long patientId;
+    private PatientDto patient;
 
     private Integer duration;
 
@@ -39,7 +42,7 @@ public class AppointmentDto {
 
     private AppointmentType type;
 
-    private List<Long> procedureIds = new ArrayList<>();
+    private List<ProcedureDto> procedures = new ArrayList<>();
 
     private String cancellationReason;
 
