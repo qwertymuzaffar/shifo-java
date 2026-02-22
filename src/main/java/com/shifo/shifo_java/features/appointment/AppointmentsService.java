@@ -144,7 +144,7 @@ public class AppointmentsService {
                 date,
                 time,
                 endTime
-        );
+        ) == 1;
 
         if (exists) {
             throw new IllegalStateException("Doctor already has an appointment in this time range");
@@ -164,7 +164,7 @@ public class AppointmentsService {
                 date,
                 time,
                 endTime
-        );
+        ) == 1;
 
         if (exists) {
             throw new IllegalStateException("Patient already has an appointment in this time range");

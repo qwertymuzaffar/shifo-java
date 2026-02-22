@@ -39,7 +39,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
                       )
                 )
             """, nativeQuery = true)
-    boolean existsDoctorOverlap(
+    Integer existsDoctorOverlap(
             @Param("doctorId") Long doctorId,
             @Param("date") LocalDate date,
             @Param("newStartTime") LocalTime newStartTime,
@@ -59,7 +59,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
                       )
                 )
             """, nativeQuery = true)
-    boolean existsPatientOverlap(
+    Integer existsPatientOverlap(
             @Param("patientId") Long patientId,
             @Param("date") LocalDate date,
             @Param("newStartTime") LocalTime newStartTime,
