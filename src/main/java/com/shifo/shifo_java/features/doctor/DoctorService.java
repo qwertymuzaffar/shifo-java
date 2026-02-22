@@ -1,8 +1,8 @@
 package com.shifo.shifo_java.features.doctor;
 
 import com.shifo.shifo_java.common.dto.PagedResponseDto;
-import com.shifo.shifo_java.common.enums.AppointmentStatus;
 import com.shifo.shifo_java.features.appointment.AppointmentRepository;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
 import com.shifo.shifo_java.features.doctor.dto.CreateDoctorDto;
 import com.shifo.shifo_java.features.doctor.dto.DoctorDto;
 import com.shifo.shifo_java.features.doctor.dto.FilterDoctorDto;
