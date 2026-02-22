@@ -1,14 +1,12 @@
 package com.shifo.shifo_java.features.appointment.dto;
 
-
-import com.shifo.shifo_java.common.dto.DateTimeDto;
-import com.shifo.shifo_java.common.enums.AppointmentType;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -16,44 +14,37 @@ import java.util.List;
 @Setter
 public class CreateAppointmentDto {
 
-    @Schema(description = "List of date/time slots")
     @NotEmpty(message = "Список дат и времени приёмов не может быть пустым")
     @Valid
+    @Schema(description = "Список дат и времени приёмов")
     private List<DateTimeDto> datetimes;
 
-    @Schema(description = "Patient ID", required = false)
-    @Nullable
-    @Min(value = 1, message = "ID пациента должен быть числом")
-    private Integer patientId;
+    @Schema(description = "ID пациента")
+    private Long patientId;
 
-    @Schema(description = "Doctor ID")
     @NotNull(message = "ID врача не может быть пустым")
-    @Min(value = 1, message = "ID врача должен быть числом")
-    private Integer doctorId;
+    @Schema(description = "ID врача", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long doctorId;
 
-    @Schema(description = "Appointment duration", example = "30")
     @NotNull(message = "Продолжительность приёма не может быть пустой")
-    @Min(value = 1, message = "Продолжительность должна быть числом")
+    @Min(value = 1, message = "Продолжительность должна быть больше 0")
+    @Schema(description = "Продолжительность приёма", example = "30")
     private Integer duration;
 
-    @Schema(description = "Notes", required = false)
-    @Nullable
+    @Schema(description = "Заметки о приёме")
     private String notes;
 
-    @Schema(description = "Symptoms", required = false)
-    @Nullable
+    @Schema(description = "Симптомы")
     private String symptoms;
 
-    @Schema(description = "Appointment type", required = false)
-    @Nullable
-    private AppointmentType type;
+    @Schema(description = "Тип приёма")
+    private AppointmentType type = AppointmentType.CONSULTATION;
 
-    @Schema(description = "Status", required = false)
-    @Nullable
-    private Integer status;
+    @Schema(description = "Статус приёма")
+    private AppointmentStatus status = AppointmentStatus.SCHEDULED;
 
-    @Schema(description = "Procedure IDs", required = false)
-    @Nullable
+    @Schema(description = "ID процедур", example = "[1,2,3]")
     private List<Long> procedureIds;
 }
+
 

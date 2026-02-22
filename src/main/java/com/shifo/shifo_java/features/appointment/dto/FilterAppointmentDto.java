@@ -1,58 +1,46 @@
 package com.shifo.shifo_java.features.appointment.dto;
 
-
-import com.shifo.shifo_java.common.enums.AppointmentStatus;
+import com.shifo.shifo_java.common.dto.PaginationDto;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
-public class FilterAppointmentDto {
-
-    @Schema(description = "Filter by doctor ID", required = false)
-    @Min(value = 1, message = "Doctor ID must be a positive number")
-    @Nullable
-    private Integer doctorId;
-
-    @Schema(description = "Filter by patient ID", required = false)
-    @Min(value = 1, message = "Patient ID must be a positive number")
-    @Nullable
-    private Integer patientId;
+@Schema(description = "Фильтр для поиска приёмов")
+public class FilterAppointmentDto extends PaginationDto {
 
     @Schema(
-            description = "Start date (YYYY-MM-DD)",
-            example = "2025-01-01",
-            required = false
+            description = "Фильтр по нескольким ID врачей",
+            example = "[1,2,3]"
     )
-    @Pattern(
-            regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "dateFrom must match YYYY-MM-DD format"
-    )
-    @Nullable
-    private String dateFrom;
+    private List<Long> doctorIds;
 
-    @Schema(
-            description = "End date (YYYY-MM-DD)",
-            example = "2025-01-01",
-            required = false
-    )
-    @Pattern(
-            regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "dateTo must match YYYY-MM-DD format"
-    )
-    @Nullable
-    private String dateTo;
+    @Schema(description = "Фильтр по ID пациента")
+    private Long patientId;
 
-    @Schema(description = "Search by patient full name or doctor name", required = false)
-    @Nullable
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Schema(description = "Дата начала диапазона", example = "2024-07-01")
+    private LocalDate dateFrom;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Schema(description = "Дата конца диапазона", example = "2024-07-05")
+    private LocalDate dateTo;
+
+    @Schema(description = "Поиск по ФИО пациента или имени врача")
     private String search;
 
-    @Schema(description = "Filter by appointment status", required = false)
-    @Nullable
+    @Schema(description = "Фильтр по статусу")
     private AppointmentStatus status;
+
+    @Schema(description = "Показать только предстоящие записи")
+    private Boolean upcoming;
 }
+
 

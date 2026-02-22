@@ -1,17 +1,22 @@
 package com.shifo.shifo_java.features.appointment.dto;
 
-import lombok.*;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppointmentDto {
 
     private Long id;
@@ -30,11 +35,11 @@ public class AppointmentDto {
 
     private String symptoms;
 
-    private String status;  // AppointmentStatus as STRING
+    private AppointmentStatus status;
 
-    private String type;    // AppointmentType as STRING
+    private AppointmentType type;
 
-    private List<Long> procedureIds;  // IDs only for simplicity
+    private List<Long> procedureIds = new ArrayList<>();
 
     private String cancellationReason;
 
@@ -42,4 +47,5 @@ public class AppointmentDto {
 
     private Instant updatedAt;
 }
+
 

@@ -1,17 +1,19 @@
 package com.shifo.shifo_java.features.appointment;
 
+import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentType;
 import com.shifo.shifo_java.features.payment.Payment;
 import com.shifo.shifo_java.features.procedure.Procedure;
 import com.shifo.shifo_java.features.doctor.Doctor;
 import com.shifo.shifo_java.features.patient.Patient;
-import com.shifo.shifo_java.common.enums.AppointmentStatus;
-import com.shifo.shifo_java.common.enums.AppointmentType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -23,7 +25,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "appointments")
+@Table(name = "appointments", indexes = {
+        @Index(name = "idx_appointments_date", columnList = "date"),
+        @Index(name = "idx_appointments_status", columnList = "status"),
+        @Index(name = "idx_appointments_type", columnList = "type"),
+        @Index(name = "idx_appointments_date_status", columnList = "date,status"),
+        @Index(name = "idx_appointments_date_type", columnList = "date,type"),
+        @Index(name = "idx_appointments_complex", columnList = "doctor_id,date,status,type"),
+        @Index(name = "idx_appointments_patient_date_time", columnList = "patient_id,date,time")
+})
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,6 +63,11 @@ public class Appointment {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @SQLDelete(sql = "UPDATE appointments SET deleted_at = now() WHERE id=?")
+    @Where(clause = "deleted_at IS NULL")
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     @Column(nullable = false)
     private Integer duration;

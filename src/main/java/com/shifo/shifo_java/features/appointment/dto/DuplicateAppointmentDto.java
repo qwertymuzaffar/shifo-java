@@ -1,23 +1,23 @@
 package com.shifo.shifo_java.features.appointment.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
 public class DuplicateAppointmentDto {
 
-    @Schema(description = "New date (YYYY-MM-DD)", example = "2024-07-01")
-    @NotBlank(message = "Дата должна быть строкой")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "Дата должна быть в формате YYYY-MM-DD")
-    private String date;
+    @NotNull
+    @Schema(example = "2024-07-01", description = "Новая дата")
+    private LocalDate date;
 
-    @Schema(description = "New time (HH:mm)", example = "10:00")
-    @NotBlank(message = "Время должно быть строкой")
-    @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Время должно быть в формате HH:mm")
-    private String time;
+    @NotNull
+    @Schema(example = "10:00", description = "Новое время")
+    private LocalTime time;
 }
 

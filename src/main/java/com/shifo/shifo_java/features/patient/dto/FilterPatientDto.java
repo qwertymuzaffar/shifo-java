@@ -31,93 +31,33 @@ public class FilterPatientDto extends PaginationDto {
 
     private SortOrder order = SortOrder.DESC;
 
-    // ---------- SEARCH ----------
-    public String getSearch() {
-        return search;
-    }
+    // standard getters/setters ONLY
 
-    public void setSearch(String search) {
-        this.search = search;
-    }
+    public String getSearch() { return search; }
+    public void setSearch(String search) { this.search = search; }
 
-    // ---------- DATES ----------
-    public LocalDate getBirthDateFrom() {
-        return birthDateFrom;
-    }
+    public LocalDate getBirthDateFrom() { return birthDateFrom; }
+    public void setBirthDateFrom(LocalDate birthDateFrom) { this.birthDateFrom = birthDateFrom; }
 
-    public void setBirthDateFrom(LocalDate birthDateFrom) {
-        this.birthDateFrom = birthDateFrom;
-    }
+    public LocalDate getBirthDateTo() { return birthDateTo; }
+    public void setBirthDateTo(LocalDate birthDateTo) { this.birthDateTo = birthDateTo; }
 
-    public LocalDate getBirthDateTo() {
-        return birthDateTo;
-    }
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
-    public void setBirthDateTo(LocalDate birthDateTo) {
-        this.birthDateTo = birthDateTo;
-    }
+    public Boolean getPositiveBalance() { return positiveBalance; }
+    public void setPositiveBalance(Boolean positiveBalance) { this.positiveBalance = positiveBalance; }
 
-    // ---------- BOOLEAN TRANSFORM (NestJS @Transform replacement) ----------
+    public PatientRegistrationStatus getRegistrationStatus() { return registrationStatus; }
+    public void setRegistrationStatus(PatientRegistrationStatus registrationStatus) { this.registrationStatus = registrationStatus; }
 
-    public Boolean getIsActive() {
-        return isActive;
-    }
+    public PatientSource getSource() { return source; }
+    public void setSource(PatientSource source) { this.source = source; }
 
-    public void setIsActive(String value) {
-        this.isActive = parseBoolean(value);
-    }
+    public PatientSortField getSort() { return sort; }
+    public void setSort(PatientSortField sort) { this.sort = sort; }
 
-    public Boolean getPositiveBalance() {
-        return positiveBalance;
-    }
-
-    public void setPositiveBalance(String value) {
-        this.positiveBalance = parseBoolean(value);
-    }
-
-    private Boolean parseBoolean(String value) {
-        if (value == null || value.isBlank()) return null;
-
-        String v = value.trim().toLowerCase();
-
-        if (v.equals("true") || v.equals("1")) return true;
-        if (v.equals("false") || v.equals("0")) return false;
-
-        throw new IllegalArgumentException("Boolean value must be true/false/1/0");
-    }
-
-    // ---------- ENUMS ----------
-
-    public PatientRegistrationStatus getRegistrationStatus() {
-        return registrationStatus;
-    }
-
-    public void setRegistrationStatus(PatientRegistrationStatus registrationStatus) {
-        this.registrationStatus = registrationStatus;
-    }
-
-    public PatientSource getSource() {
-        return source;
-    }
-
-    public void setSource(PatientSource source) {
-        this.source = source;
-    }
-
-    public PatientSortField getSort() {
-        return sort;
-    }
-
-    public void setSort(PatientSortField sort) {
-        this.sort = sort;
-    }
-
-    public SortOrder getOrder() {
-        return order;
-    }
-
-    public void setOrder(SortOrder order) {
-        this.order = order;
-    }
+    public SortOrder getOrder() { return order; }
+    public void setOrder(SortOrder order) { this.order = order; }
 }
 

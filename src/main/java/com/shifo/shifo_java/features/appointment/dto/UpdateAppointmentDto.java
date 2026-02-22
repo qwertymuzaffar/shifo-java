@@ -1,68 +1,59 @@
 package com.shifo.shifo_java.features.appointment.dto;
 
-
-import com.shifo.shifo_java.common.enums.AppointmentType;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.enums.AppointmentType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
 @Setter
+@Schema(description = "DTO для обновления приёма (частичное обновление)")
 public class UpdateAppointmentDto {
 
-    @Schema(description = "Appointment time", example = "08:00")
-    @NotBlank(message = "Время приёма не может быть пустым")
-    @Pattern(
-            regexp = "^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$",
-            message = "Время приёма должно быть в формате HH:MM"
-    )
-    private String time;
+    @Schema(description = "Время приёма", example = "08:00")
+    private LocalTime time;
 
-    @Schema(description = "Appointment date", example = "2023-08-01")
-    @NotBlank(message = "Дата приёма не может быть пустой")
-    @Pattern(
-            regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "Дата приёма должна быть в формате YYYY-MM-DD"
-    )
-    private String date;
+    @Schema(description = "Дата приёма", example = "2023-08-01")
+    private LocalDate date;
 
-    @Schema(description = "Patient ID")
-    @NotNull(message = "ID пациента не может быть пустым")
-    @Min(value = 1, message = "ID пациента должен быть числом")
-    private Integer patientId;
+    @Schema(description = "ID пациента")
+    private Long patientId;
 
-    @Schema(description = "Doctor ID")
-    @NotNull(message = "ID врача не может быть пустым")
-    @Min(value = 1, message = "ID врача должен быть числом")
-    private Integer doctorId;
+    @Schema(description = "ID врача")
+    private Long doctorId;
 
-    @Schema(description = "Appointment duration", example = "30")
-    @NotNull(message = "Продолжительность приёма не может быть пустой")
-    @Min(value = 1, message = "Продолжительность должна быть числом")
+    @Min(value = 1, message = "Продолжительность должна быть больше 0")
+    @Schema(description = "Продолжительность приёма", example = "30")
     private Integer duration;
 
-    @Schema(description = "Notes", required = false)
-    @Nullable
+    @Size(max = 5000, message = "Заметки слишком длинные")
+    @Schema(description = "Заметки о приёме")
     private String notes;
 
-    @Schema(description = "Symptoms", required = false)
-    @Nullable
+    @Size(max = 5000, message = "Симптомы слишком длинные")
+    @Schema(description = "Симптомы")
     private String symptoms;
 
-    @Schema(description = "Appointment type", required = false)
-    @Nullable
+    @Schema(description = "Тип приёма")
     private AppointmentType type;
 
-    @Schema(description = "Status", required = false)
-    @Nullable
-    private Integer status;
+    @Schema(
+            description = "Статус приёма",
+            example = "SCHEDULED"
+    )
+    private AppointmentStatus status;
 
-    @Schema(description = "Procedure IDs", required = false)
-    @Nullable
+    @Schema(
+            description = "ID процедур",
+            example = "[1,2,3]"
+    )
     private List<Long> procedureIds;
 }
-
