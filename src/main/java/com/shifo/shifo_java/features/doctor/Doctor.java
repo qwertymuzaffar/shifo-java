@@ -1,6 +1,6 @@
 package com.shifo.shifo_java.features.doctor;
 
-import com.shifo.shifo_java.features.appointment.Appointment;
+import com.shifo.shifo_java.features.appointment.model.Appointment;
 import com.shifo.shifo_java.features.doctor.dto.WorkingHoursDto;
 import com.shifo.shifo_java.features.specialization.Specialization;
 import com.shifo.shifo_java.features.user.User;

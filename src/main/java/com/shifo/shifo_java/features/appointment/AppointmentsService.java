@@ -1,6 +1,7 @@
 package com.shifo.shifo_java.features.appointment;
 
 import com.shifo.shifo_java.features.appointment.dto.*;
+import com.shifo.shifo_java.features.appointment.model.Appointment;
 import com.shifo.shifo_java.features.appointment.specification.AppointmentSpecification;
 import com.shifo.shifo_java.features.doctor.Doctor;
 import com.shifo.shifo_java.features.doctor.DoctorRepository;

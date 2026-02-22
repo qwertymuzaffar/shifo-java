@@ -1,6 +1,7 @@
 package com.shifo.shifo_java.features.appointment;
 
-import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.model.Appointment;
+import com.shifo.shifo_java.features.appointment.model.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

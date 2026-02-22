@@ -1,4 +1,4 @@
-package com.shifo.shifo_java.features.appointment.enums;
+package com.shifo.shifo_java.features.appointment.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

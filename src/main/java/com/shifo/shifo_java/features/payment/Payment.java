@@ -2,7 +2,7 @@ package com.shifo.shifo_java.features.payment;
 
 import com.shifo.shifo_java.common.enums.PaymentStatus;
 import com.shifo.shifo_java.common.enums.PaymentType;
-import com.shifo.shifo_java.features.appointment.Appointment;
+import com.shifo.shifo_java.features.appointment.model.Appointment;
 import com.shifo.shifo_java.common.enums.PaymentKind;
 import jakarta.persistence.*;
 import lombok.*;

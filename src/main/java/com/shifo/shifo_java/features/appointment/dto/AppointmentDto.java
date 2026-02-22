@@ -6,8 +6,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
-import com.shifo.shifo_java.features.appointment.enums.AppointmentType;
+import com.shifo.shifo_java.features.appointment.model.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.model.AppointmentType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,5 @@
-package com.shifo.shifo_java.features.appointment;
+package com.shifo.shifo_java.features.appointment.model;
 
-import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
-import com.shifo.shifo_java.features.appointment.enums.AppointmentType;
 import com.shifo.shifo_java.features.payment.Payment;
 import com.shifo.shifo_java.features.procedure.Procedure;
 import com.shifo.shifo_java.features.doctor.Doctor;

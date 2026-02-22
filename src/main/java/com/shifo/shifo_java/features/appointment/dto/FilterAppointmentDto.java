@@ -1,7 +1,7 @@
 package com.shifo.shifo_java.features.appointment.dto;
 
 import com.shifo.shifo_java.common.dto.PaginationDto;
-import com.shifo.shifo_java.features.appointment.enums.AppointmentStatus;
+import com.shifo.shifo_java.features.appointment.model.AppointmentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
