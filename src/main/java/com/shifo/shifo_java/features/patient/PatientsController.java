@@ -2,6 +2,7 @@ package com.shifo.shifo_java.features.patient;
 
 import com.shifo.shifo_java.common.dto.PagedResponseDto;
 import com.shifo.shifo_java.features.patient.dto.*;
+import com.shifo.shifo_java.features.patient.enums.PatientSource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,6 +44,17 @@ public class PatientsController {
             @ApiResponse(responseCode = "200", description = "Список пациентов с пагинацией")
     })
     public ResponseEntity<PagedResponseDto<PatientDto>> findAll(@Valid @ModelAttribute FilterPatientDto filterDto) {
+        PagedResponseDto<PatientDto> patients = patientsService.findAll(filterDto);
+        return ResponseEntity.ok(patients);
+    }
+
+    @GetMapping("telegram")
+    @Operation(summary = "Получить всех (telegram)пациентов с фильтрацией и пагинацией")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список пациентов с пагинацией")
+    })
+    public ResponseEntity<PagedResponseDto<PatientDto>> findAllTelegram(@Valid @ModelAttribute FilterPatientDto filterDto) {
+        filterDto.setSource(PatientSource.TELEGRAM);
         PagedResponseDto<PatientDto> patients = patientsService.findAll(filterDto);
         return ResponseEntity.ok(patients);
     }

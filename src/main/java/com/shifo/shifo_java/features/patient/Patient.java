@@ -1,6 +1,8 @@
 package com.shifo.shifo_java.features.patient;
 
 import com.shifo.shifo_java.features.appointment.Appointment;
+import com.shifo.shifo_java.features.patient.enums.PatientRegistrationStatus;
+import com.shifo.shifo_java.features.patient.enums.PatientSource;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -53,6 +55,17 @@ public class Patient {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PatientStatus status = PatientStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "registration_status", nullable = false)
+    private PatientRegistrationStatus registrationStatus = PatientRegistrationStatus.APPROVED;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false)
+    private PatientSource source = PatientSource.MANUAL;
+
+    @Column(name = "telegram_chat_id")
+    private String telegramChatId;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
