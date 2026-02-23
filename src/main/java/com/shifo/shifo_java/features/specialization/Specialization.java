@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "specializations")
+@SQLDelete(sql = "UPDATE specializations SET deleted_at = now() WHERE id=?")
+@Where(clause = "deleted_at IS NULL")
 public class Specialization {
 
     @Id
@@ -26,7 +30,7 @@ public class Specialization {
     @Column(unique = true, nullable = false, length = 255)
     private String name;
 
-    @OneToMany(mappedBy = "specialization", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "specialization")
     private List<Doctor> doctors = new ArrayList<>();
 
     @CreationTimestamp
@@ -36,4 +40,7 @@ public class Specialization {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 }
