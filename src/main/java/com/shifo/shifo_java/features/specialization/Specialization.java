@@ -20,7 +20,6 @@ import java.util.List;
 @Entity
 @Table(name = "specializations")
 @SQLDelete(sql = "UPDATE specializations SET deleted_at = now() WHERE id=?")
-@Where(clause = "deleted_at IS NULL")
 public class Specialization {
 
     @Id
