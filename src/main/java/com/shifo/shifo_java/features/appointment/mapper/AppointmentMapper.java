@@ -1,4 +1,4 @@
-package com.shifo.shifo_java.features.appointment;
+package com.shifo.shifo_java.features.appointment.mapper;
 
 import com.shifo.shifo_java.features.appointment.dto.AppointmentDto;
 import com.shifo.shifo_java.features.appointment.dto.CreateAppointmentDto;

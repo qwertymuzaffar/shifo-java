@@ -1,12 +1,17 @@
 package com.shifo.shifo_java.features.appointment;
 
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import com.shifo.shifo_java.features.appointment.dto.*;
+import com.shifo.shifo_java.features.appointment.mapper.AppointmentDetailsMapper;
+import com.shifo.shifo_java.features.appointment.mapper.AppointmentMapper;
 import com.shifo.shifo_java.features.appointment.model.Appointment;
 import com.shifo.shifo_java.features.appointment.specification.AppointmentSpecification;
 import com.shifo.shifo_java.features.doctor.Doctor;
 import com.shifo.shifo_java.features.doctor.DoctorRepository;
 import com.shifo.shifo_java.features.patient.Patient;
 import com.shifo.shifo_java.features.patient.PatientRepository;
+import com.shifo.shifo_java.features.payment.Payment;
+import com.shifo.shifo_java.features.payment.PaymentRepository;
 import com.shifo.shifo_java.features.procedure.Procedure;
 import com.shifo.shifo_java.features.procedure.ProcedureRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +20,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -32,7 +39,9 @@ public class AppointmentsService {
     private final PatientRepository patientRepository;
     private final ProcedureRepository procedureRepository;
     private final AppointmentMapper appointmentMapper;
+    private final AppointmentDetailsMapper appointmentDetailsMapper;
     private final TransactionTemplate transactionTemplate;
+    private final PaymentRepository paymentRepository;
 
     /**
      * Equivalent of NestJS create() — batch creation with partial success.
@@ -181,5 +190,27 @@ public class AppointmentsService {
         return entities.stream()
                 .map(appointmentMapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AppointmentDetailsDto findOne(Long id) {
+
+        Appointment appointment = appointmentRepository
+                .findDetailedWithProcedures(id)
+                .orElseThrow(() -> new NotFoundException("Appointment not found"));
+
+        // Load payments in second query
+        List<Payment> payments = paymentRepository.findByAppointmentId(id);
+
+        appointment.setPayments(payments);
+
+        BigDecimal total = payments.stream()
+                .map(p -> p.getAmount() == null ? BigDecimal.ZERO : p.getAmount())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        AppointmentDetailsDto dto = appointmentDetailsMapper.toDto(appointment);
+        dto.setTotalPaymentAmount(total);
+
+        return dto;
     }
 }

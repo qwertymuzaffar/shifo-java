@@ -5,7 +5,6 @@ import com.shifo.shifo_java.features.appointment.dto.AppointmentTypeCountDto;
 import com.shifo.shifo_java.features.appointment.dto.TotalAppointmentsDto;
 import com.shifo.shifo_java.features.doctor.dto.DoctorRatingDto;
 import com.shifo.shifo_java.features.patient.dto.TotalPatientsDto;
-import com.shifo.shifo_java.features.payment.dto.PaymentMethodStatsDto;
 import lombok.*;
 
 import java.util.List;
@@ -23,6 +22,5 @@ public class DashboardAnalyticsDto {
     private AppointmentStatusCountDto appointmentStatuses;
     private AppointmentTypeCountDto appointmentTypes;
     private List<DoctorRatingDto> doctorRatings;
-    private List<PaymentMethodStatsDto> paymentMethods;
 }
 

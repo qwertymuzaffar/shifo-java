@@ -1,13 +1,9 @@
 package com.shifo.shifo_java.features.appointment;
 
-import com.shifo.shifo_java.common.dto.PagedResponseDto;
 import com.shifo.shifo_java.features.appointment.dto.*;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +34,11 @@ public class AppointmentsController {
     @GetMapping
     public ResponseEntity<List<AppointmentDto>> findAll(@ModelAttribute FilterAppointmentDto filter) {
         return ResponseEntity.ok(appointmentService.findAll(filter));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AppointmentDetailsDto> findOne(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.findOne(id));
     }
 
 }

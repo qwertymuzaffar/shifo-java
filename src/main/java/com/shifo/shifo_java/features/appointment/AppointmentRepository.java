@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
     @Modifying
@@ -66,4 +67,28 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
             @Param("newEndTime") LocalTime newEndTime
     );
 
+    @Query("""
+                SELECT DISTINCT a
+                FROM Appointment a
+                LEFT JOIN FETCH a.patient
+                LEFT JOIN FETCH a.payments
+                LEFT JOIN FETCH a.procedures
+                LEFT JOIN FETCH a.doctor d
+                LEFT JOIN FETCH d.specialization
+                LEFT JOIN FETCH d.user
+                WHERE a.id = :id
+            """)
+    Optional<Appointment> findDetailedById(Long id);
+
+    @Query("""
+                SELECT DISTINCT a
+                FROM Appointment a
+                LEFT JOIN FETCH a.patient
+                LEFT JOIN FETCH a.doctor d
+                LEFT JOIN FETCH d.specialization
+                LEFT JOIN FETCH d.user
+                LEFT JOIN FETCH a.procedures
+                WHERE a.id = :id
+            """)
+    Optional<Appointment> findDetailedWithProcedures(Long id);
 }
