@@ -41,4 +41,11 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             """)
     Optional<Doctor> findActiveByIdWithUser(@Param("id") Long id);
 
+    @Query(value = """
+                SELECT *
+                FROM doctors d
+                WHERE d.id = :id
+            """, nativeQuery = true)
+    Doctor findByIdIncludingDeleted(Long id);
+
 }
