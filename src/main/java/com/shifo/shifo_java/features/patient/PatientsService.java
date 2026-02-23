@@ -9,13 +9,12 @@ import com.shifo.shifo_java.features.patient.dto.PatientDto;
 import com.shifo.shifo_java.features.patient.dto.UpdatePatientDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
