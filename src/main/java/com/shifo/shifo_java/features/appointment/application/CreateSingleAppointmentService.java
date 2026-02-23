@@ -5,7 +5,7 @@ import com.shifo.shifo_java.features.appointment.application.command.CreateAppoi
 import com.shifo.shifo_java.features.appointment.domain.AppointmentAvailabilityChecker;
 import com.shifo.shifo_java.features.appointment.dto.AppointmentDto;
 import com.shifo.shifo_java.features.appointment.mapper.AppointmentMapper;
-import com.shifo.shifo_java.features.appointment.model.Appointment;
+import com.shifo.shifo_java.features.appointment.Appointment;
 import com.shifo.shifo_java.features.doctor.Doctor;
 import com.shifo.shifo_java.features.doctor.DoctorRepository;
 import com.shifo.shifo_java.features.patient.Patient;

@@ -1,6 +1,6 @@
 package com.shifo.shifo_java.features.patient;
 
-import com.shifo.shifo_java.features.appointment.model.Appointment;
+import com.shifo.shifo_java.features.appointment.Appointment;
 import com.shifo.shifo_java.features.patient.enums.PatientGender;
 import com.shifo.shifo_java.features.patient.enums.PatientRegistrationStatus;
 import com.shifo.shifo_java.features.patient.enums.PatientSource;

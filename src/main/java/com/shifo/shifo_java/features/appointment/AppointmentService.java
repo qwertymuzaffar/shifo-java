@@ -4,7 +4,6 @@ import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import com.shifo.shifo_java.features.appointment.dto.*;
 import com.shifo.shifo_java.features.appointment.mapper.AppointmentDetailsMapper;
 import com.shifo.shifo_java.features.appointment.mapper.AppointmentMapper;
-import com.shifo.shifo_java.features.appointment.model.Appointment;
 import com.shifo.shifo_java.features.appointment.specification.AppointmentSpecification;
 import com.shifo.shifo_java.features.payment.Payment;
 import com.shifo.shifo_java.features.payment.PaymentRepository;

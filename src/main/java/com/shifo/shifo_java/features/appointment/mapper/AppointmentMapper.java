@@ -2,11 +2,7 @@ package com.shifo.shifo_java.features.appointment.mapper;
 
 import com.shifo.shifo_java.features.appointment.application.command.CreateAppointmentCommand;
 import com.shifo.shifo_java.features.appointment.dto.AppointmentDto;
-import com.shifo.shifo_java.features.appointment.dto.CreateAppointmentDto;
-import com.shifo.shifo_java.features.appointment.dto.DateTimeDto;
-import com.shifo.shifo_java.features.appointment.model.Appointment;
-import com.shifo.shifo_java.features.appointment.model.AppointmentStatus;
-import com.shifo.shifo_java.features.appointment.model.AppointmentType;
+import com.shifo.shifo_java.features.appointment.Appointment;
 import com.shifo.shifo_java.features.doctor.Doctor;
 import com.shifo.shifo_java.features.doctor.DoctorMapper;
 import com.shifo.shifo_java.features.patient.Patient;

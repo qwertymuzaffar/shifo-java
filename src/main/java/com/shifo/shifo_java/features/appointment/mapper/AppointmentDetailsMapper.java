@@ -1,7 +1,7 @@
 package com.shifo.shifo_java.features.appointment.mapper;
 
 import com.shifo.shifo_java.features.appointment.dto.AppointmentDetailsDto;
-import com.shifo.shifo_java.features.appointment.model.Appointment;
+import com.shifo.shifo_java.features.appointment.Appointment;
 import com.shifo.shifo_java.features.doctor.DoctorMapper;
 import com.shifo.shifo_java.features.patient.PatientMapper;
 import com.shifo.shifo_java.features.procedure.ProcedureMapper;
