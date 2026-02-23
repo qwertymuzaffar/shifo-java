@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.appointment;
 
+import com.shifo.shifo_java.features.appointment.application.CreateBatchAppointmentsService;
 import com.shifo.shifo_java.features.appointment.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,15 +21,19 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 public class AppointmentsController {
 
-    private final AppointmentsService appointmentService;
+    private final AppointmentService appointmentService;
 
+
+    private final CreateBatchAppointmentsService createBatchAppointmentsService;
 
     @PostMapping
     public ResponseEntity<CreateAppointmentResultDto> create(
-            @Valid @RequestBody CreateAppointmentDto dto
+            @RequestBody @Valid CreateAppointmentDto dto
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(appointmentService.create(dto));
+        CreateAppointmentResultDto result =
+                createBatchAppointmentsService.create(dto);
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping

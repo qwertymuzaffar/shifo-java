@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.appointment.mapper;
 
+import com.shifo.shifo_java.features.appointment.application.command.CreateAppointmentCommand;
 import com.shifo.shifo_java.features.appointment.dto.AppointmentDto;
 import com.shifo.shifo_java.features.appointment.dto.CreateAppointmentDto;
 import com.shifo.shifo_java.features.appointment.dto.DateTimeDto;
@@ -30,33 +31,22 @@ public class AppointmentMapper {
     }
 
     public Appointment toEntity(
-            CreateAppointmentDto dto,
-            DateTimeDto datetime,
+            CreateAppointmentCommand cmd,
             Doctor doctor,
             Patient patient,
             List<Procedure> procedures
     ) {
+
         Appointment appointment = new Appointment();
 
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
-
-        appointment.setDate(datetime.getDate());
-        appointment.setTime(datetime.getTime());
-
-        appointment.setDuration(dto.getDuration());
-        appointment.setNotes(dto.getNotes());
-        appointment.setSymptoms(dto.getSymptoms());
+        appointment.setDate(cmd.date());
+        appointment.setTime(cmd.time());
+        appointment.setDuration(cmd.duration());
+        appointment.setType(cmd.type());
 
         appointment.setProcedures(procedures);
-
-        appointment.setType(
-                dto.getType() != null ? dto.getType() : AppointmentType.CONSULTATION
-        );
-
-        appointment.setStatus(
-                dto.getStatus() != null ? dto.getStatus() : AppointmentStatus.SCHEDULED
-        );
 
         return appointment;
     }
