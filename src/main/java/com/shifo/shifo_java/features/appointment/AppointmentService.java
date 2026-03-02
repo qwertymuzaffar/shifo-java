@@ -6,7 +6,7 @@ import com.shifo.shifo_java.features.appointment.mapper.AppointmentDetailsMapper
 import com.shifo.shifo_java.features.appointment.mapper.AppointmentMapper;
 import com.shifo.shifo_java.features.appointment.specification.AppointmentSpecification;
 import com.shifo.shifo_java.features.payment.Payment;
-import com.shifo.shifo_java.features.payment.PaymentRepository;
+import com.shifo.shifo_java.features.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

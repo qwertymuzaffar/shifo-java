@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,17 +34,9 @@ public class FilterPaymentDto extends PaginationDto {
     @Schema(description = "Поиск")
     private String search;
 
-    @Pattern(
-            regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "dateFrom должен быть в формате YYYY-MM-DD"
-    )
     @Schema(description = "Дата с (YYYY-MM-DD)", example = "2025-01-01")
-    private String dateFrom;
+    private LocalDate dateFrom;
 
-    @Pattern(
-            regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "dateTo должен быть в формате YYYY-MM-DD"
-    )
     @Schema(description = "Дата по (YYYY-MM-DD)", example = "2025-01-31")
-    private String dateTo;
+    private LocalDate dateTo;
 }
