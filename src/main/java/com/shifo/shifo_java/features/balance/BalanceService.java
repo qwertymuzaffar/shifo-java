@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -77,5 +78,13 @@ public class BalanceService {
             case DEBT, BALANCE_DEDUCTION -> payment.getAmount().negate();
             default -> BigDecimal.ZERO;
         };
+    }
+
+    @Transactional
+    public void handlePaymentStatusRemoved(Long paymentId) {
+
+        balanceRepository
+                .findByEntityIdAndEntityType(paymentId, EntityType.PAYMENT)
+                .ifPresent(balanceRepository::delete);
     }
 }

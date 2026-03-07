@@ -5,6 +5,8 @@ import com.shifo.shifo_java.features.payment.dto.FilterPaymentDto;
 import com.shifo.shifo_java.features.payment.dto.ListWithCountDto;
 import com.shifo.shifo_java.features.payment.dto.PaymentDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +38,34 @@ public class PaymentController {
             @Valid @ModelAttribute FilterPaymentDto filterDto
     ) {
         return ResponseEntity.ok(paymentsService.findAll(filterDto));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Удалить платеж",
+            description = """
+                    Удаляет платеж (мягкое удаление) и выполняет связанные операции:
+                    
+                    При удалении платежа:
+                    1. Удаляется связанная запись из таблицы balances (если существует)
+                    2. Если платеж имел статус 'paid', происходит обратное изменение баланса пациента:
+                       - debt и balance_deduction → сумма добавляется обратно
+                       - prepayment и debt_payment → сумма вычитается
+                    3. Платеж помечается как удаленный (soft delete)
+                    
+                    Типы платежей:
+                    - debt
+                    - prepayment
+                    - debt_payment
+                    - balance_deduction
+                    """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Платеж успешно удален"),
+            @ApiResponse(responseCode = "404", description = "Платеж не найден"),
+            @ApiResponse(responseCode = "403", description = "Нет прав доступа")
+    })
+    public void remove(@PathVariable Long id) {
+        paymentsService.remove(id);
     }
 }

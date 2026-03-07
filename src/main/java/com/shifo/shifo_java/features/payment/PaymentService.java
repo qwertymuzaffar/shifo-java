@@ -1,6 +1,8 @@
 package com.shifo.shifo_java.features.payment;
 
 import com.shifo.shifo_java.features.balance.BalanceService;
+import com.shifo.shifo_java.features.patient.Patient;
+import com.shifo.shifo_java.features.patient.PatientRepository;
 import com.shifo.shifo_java.features.payment.dto.CreatePaymentDto;
 import com.shifo.shifo_java.features.payment.dto.FilterPaymentDto;
 import com.shifo.shifo_java.features.payment.dto.ListWithCountDto;
@@ -16,9 +18,13 @@ import com.shifo.shifo_java.features.payment.repository.PaymentQueryRepository;
 import com.shifo.shifo_java.features.payment.repository.PaymentRepository;
 import com.shifo.shifo_java.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,13 +35,16 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PatientRepository patientRepository;
+    private final PaymentQueryRepository paymentQueryRepository;
+
     private final BalanceService balanceService;
     private final PaymentMapper paymentMapper;
-    private final SecurityUtils securityUtils;
     private final PaymentPolicyRegistry policyRegistry;
     private final PaymentContextResolver contextResolver;
+    private final SecurityUtils securityUtils;
     private final PaymentFactory paymentFactory;
-    private final PaymentQueryRepository paymentQueryRepository;
+
 
     @Transactional
     public PaymentDto create(CreatePaymentDto dto) {
@@ -89,5 +98,81 @@ public class PaymentService {
         List<PaymentDto> dto = paymentMapper.toDtoList(ordered);
 
         return new ListWithCountDto<>(dto, total);
+    }
+
+
+    @Transactional
+    public void remove(Long id) {
+
+        // 1. Find payment with relations
+        Payment payment = paymentRepository
+                .findByIdWithRelations(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Оплата с id " + id + " не найден"
+                        ));
+
+        balanceService.handlePaymentStatusRemoved(payment.getId());
+
+        // 3. Reverse patient balance if payment was paid
+        if (payment.getStatus() == PaymentStatus.PAID) {
+
+            PaymentKind kind = payment.getPaymentKind();
+
+            Long targetPatientId =
+                    payment.getPatientId() != null
+                            ? payment.getPatientId()
+                            : payment.getAppointment() != null
+                            ? payment.getAppointment().getPatient().getId()
+                            : null;
+
+            if (targetPatientId != null && affectsBalance(kind)) {
+
+                Patient patient = patientRepository
+                        .findById(targetPatientId)
+                        .orElse(null);
+
+                if (patient != null) {
+
+                    BigDecimal currentBalance = patient.getBalance() != null
+                            ? patient.getBalance()
+                            : BigDecimal.ZERO;
+
+                    BigDecimal amount = payment.getAmount();
+
+                    BigDecimal delta;
+
+                    // reverse effect
+                    if (kind == PaymentKind.DEBT || kind == PaymentKind.BALANCE_DEDUCTION) {
+                        // was subtracted → add back
+                        delta = amount;
+                    } else {
+                        // was added → subtract
+                        delta = amount.negate();
+                    }
+
+                    BigDecimal newBalance = currentBalance
+                            .add(delta)
+                            .setScale(2, RoundingMode.HALF_UP);
+
+                    patient.setBalance(newBalance);
+
+                    patientRepository.save(patient);
+                }
+            }
+        }
+
+        // 4. Soft delete payment
+        payment.softDelete();   // sets deletedAt
+        paymentRepository.save(payment);
+    }
+
+
+    private boolean affectsBalance(PaymentKind kind) {
+        return kind == PaymentKind.DEBT
+                || kind == PaymentKind.PREPAYMENT
+                || kind == PaymentKind.DEBT_PAYMENT
+                || kind == PaymentKind.BALANCE_DEDUCTION;
     }
 }

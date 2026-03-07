@@ -16,6 +16,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments",
@@ -93,5 +94,9 @@ public class Payment {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    public void softDelete() {
+        this.deletedAt = Instant.now();
+    }
 }
 
