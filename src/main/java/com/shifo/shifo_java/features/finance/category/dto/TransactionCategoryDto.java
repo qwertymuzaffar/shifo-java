@@ -3,6 +3,7 @@ package com.shifo.shifo_java.features.finance.category.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -27,8 +28,8 @@ public class TransactionCategoryDto {
     private Integer sortOrder;
 
     @Schema(description = "Creation timestamp")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Schema(description = "Last update timestamp")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }
