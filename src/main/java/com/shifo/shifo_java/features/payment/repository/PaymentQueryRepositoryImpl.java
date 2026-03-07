@@ -32,7 +32,6 @@ public class PaymentQueryRepositoryImpl implements PaymentQueryRepository {
                 PaymentPredicates.build(filter, cb, payment, appointment, appointmentPatient, paymentPatient);
 
         idQuery.select(payment.get("id"))
-                .distinct(true)
                 .where(predicates.toArray(new Predicate[0]))
                 .orderBy(
                         cb.desc(payment.get("paidAt")),
@@ -59,7 +58,7 @@ public class PaymentQueryRepositoryImpl implements PaymentQueryRepository {
         List<Predicate> predicates =
                 PaymentPredicates.build(filter, cb, payment, appointment, appointmentPatient, paymentPatient);
 
-        cq.select(cb.countDistinct(payment.get("id")))
+        cq.select(cb.count(payment))
                 .where(predicates.toArray(new Predicate[0]));
 
         return entityManager.createQuery(cq).getSingleResult();
