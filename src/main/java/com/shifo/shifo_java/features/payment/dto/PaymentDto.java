@@ -1,5 +1,7 @@
 package com.shifo.shifo_java.features.payment.dto;
 
+import com.shifo.shifo_java.features.appointment.Appointment;
+import com.shifo.shifo_java.features.appointment.dto.AppointmentDto;
 import com.shifo.shifo_java.features.patient.dto.PatientDto;
 import com.shifo.shifo_java.features.payment.model.PaymentKind;
 import com.shifo.shifo_java.features.payment.model.PaymentStatus;
@@ -18,6 +20,8 @@ public class PaymentDto {
     private Long id;
 
     private Long appointmentId;
+
+    private AppointmentDto appointment;
 
     private PatientDto patient;
 

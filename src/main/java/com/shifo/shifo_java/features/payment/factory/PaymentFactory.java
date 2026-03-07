@@ -10,9 +10,9 @@ public class PaymentFactory {
     public Payment create(PaymentContext context) {
 
         return Payment.builder()
-                .appointmentId(
+                .appointment(
                         context.getAppointment() != null
-                                ? context.getAppointment().getId()
+                                ? context.getAppointment()
                                 : null
                 )
                 .patientId(context.getPatient().getId())

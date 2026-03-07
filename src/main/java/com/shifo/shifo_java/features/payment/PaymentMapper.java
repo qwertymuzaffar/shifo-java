@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.payment;
 
+import com.shifo.shifo_java.features.appointment.mapper.AppointmentMapper;
 import com.shifo.shifo_java.features.patient.PatientMapper;
 import com.shifo.shifo_java.features.payment.dto.PaymentDto;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,15 @@ import java.util.List;
 public class PaymentMapper {
 
     private final PatientMapper patientMapper;
+    private final AppointmentMapper appointmentMapper;
 
     public PaymentDto toDto(Payment entity) {
         if (entity == null) return null;
 
         return PaymentDto.builder()
                 .id(entity.getId())
-                .appointmentId(entity.getAppointmentId())
+                .appointmentId(entity.getAppointment() != null ? entity.getAppointment().getId() : null)
+                .appointment(appointmentMapper.toDto(entity.getAppointment()))
                 .patient(patientMapper.toDto(entity.getPatient()))
                 .userId(entity.getUserId())
                 .amount(entity.getAmount())

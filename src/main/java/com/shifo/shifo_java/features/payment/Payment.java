@@ -42,11 +42,8 @@ public class Payment {
     private Long id;
 
     // ---- Appointment ----
-    @Column(name = "appointment_id")
-    private Long appointmentId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "appointment_id", insertable = false, updatable = false)
+    @JoinColumn(name = "appointment_id", nullable = true)
     private Appointment appointment;
 
     // ---- Patient ----
