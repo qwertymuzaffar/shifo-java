@@ -1,5 +1,8 @@
-package com.shifo.shifo_java.features.balance.model;
+package com.shifo.shifo_java.features.balance;
 
+import com.shifo.shifo_java.features.balance.model.BalanceTransactionType;
+import com.shifo.shifo_java.features.balance.model.EntityType;
+import com.shifo.shifo_java.features.payment.model.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,9 +41,9 @@ public class BalanceTransaction {
 
     // Cash / Card / etc. (informational only)
     @Column(name = "payment_method", length = 50)
-    private String paymentMethod;
+    private PaymentType paymentMethod;
 
-    @Column(name = "patient_id", nullable = false)
+    @Column(name = "patient_id")
     private Long patientId;
 
     @Column(name = "created_at", updatable = false)

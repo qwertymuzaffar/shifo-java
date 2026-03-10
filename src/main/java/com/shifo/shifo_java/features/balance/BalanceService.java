@@ -1,8 +1,10 @@
 package com.shifo.shifo_java.features.balance;
 
-import com.shifo.shifo_java.features.balance.model.BalanceTransaction;
+import com.shifo.shifo_java.features.balance.BalanceTransaction;
 import com.shifo.shifo_java.features.balance.model.BalanceTransactionType;
 import com.shifo.shifo_java.features.balance.model.EntityType;
+import com.shifo.shifo_java.features.finance.transaction.Transaction;
+import com.shifo.shifo_java.features.finance.transaction.model.TransactionType;
 import com.shifo.shifo_java.features.payment.Payment;
 import com.shifo.shifo_java.features.payment.model.PaymentStatus;
 import lombok.RequiredArgsConstructor;
@@ -51,15 +53,9 @@ public class BalanceService {
                 .entityType(EntityType.PAYMENT)
                 .transactionType(resolveType(payment))
                 .amount(resolveSignedAmount(payment))
-                .paymentMethod(resolvePaymentMethod(payment))
+                .paymentMethod(payment.getPaymentType())
                 .createdAt(Instant.now())
                 .build();
-    }
-
-    private String resolvePaymentMethod(Payment payment) {
-        return payment.getPaymentType() != null
-                ? payment.getPaymentType().name()
-                : null;
     }
 
     private BalanceTransactionType resolveType(Payment payment) {
@@ -86,5 +82,35 @@ public class BalanceService {
         balanceRepository
                 .findByEntityIdAndEntityType(paymentId, EntityType.PAYMENT)
                 .ifPresent(balanceRepository::delete);
+    }
+
+    @Transactional
+    public BalanceTransaction handleTransactionStatusChange(Transaction transaction) {
+        // For transactions, we consider them "paid" when they are created
+        // Check if balance record already exists for this transaction
+        BalanceTransaction existingBalance = balanceRepository
+                .findByEntityIdAndEntityType(transaction.getId(), EntityType.TRANSACTION)
+                .orElse(null);
+
+        if (existingBalance == null) {
+            // For expense transactions -> negative amount
+            // For income transactions -> positive amount
+            BigDecimal amount = transaction.getAmount().abs();
+
+            BigDecimal balanceAmount = transaction.getType() == TransactionType.EXPENSE
+                    ? amount.negate()
+                    : amount;
+
+            BalanceTransaction balance = BalanceTransaction.builder()
+                    .amount(balanceAmount)
+                    .entityId(transaction.getId())
+                    .entityType(EntityType.TRANSACTION)
+                    .paymentMethod(transaction.getPaymentMethod())
+                    .build();
+
+            return balanceRepository.save(balance);
+        }
+
+        return null;
     }
 }

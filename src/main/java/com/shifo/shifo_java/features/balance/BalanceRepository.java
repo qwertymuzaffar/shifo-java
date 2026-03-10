@@ -1,6 +1,5 @@
 package com.shifo.shifo_java.features.balance;
 
-import com.shifo.shifo_java.features.balance.model.BalanceTransaction;
 import com.shifo.shifo_java.features.balance.model.EntityType;
 import org.springframework.data.jpa.repository.JpaRepository;
 

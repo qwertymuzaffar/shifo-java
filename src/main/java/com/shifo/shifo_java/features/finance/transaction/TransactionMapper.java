@@ -10,7 +10,7 @@ public class TransactionMapper {
         return TransactionDto.builder()
                 .id(entity.getId())
                 .type(entity.getType().name().toLowerCase())
-                .paymentMethod(entity.getPaymentMethod().name().toLowerCase())
+                .paymentMethod(entity.getPaymentMethod())
                 .amount(entity.getAmount())
                 .category(entity.getCategory().getName())
                 .date(entity.getDate())

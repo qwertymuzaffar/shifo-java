@@ -1,6 +1,7 @@
 package com.shifo.shifo_java.features.balance;
 
 import com.shifo.shifo_java.features.balance.model.EntityType;
+import com.shifo.shifo_java.features.payment.model.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,18 +23,21 @@ public class Balance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Positive = credit, Negative = debit
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "entity_id")
+    // What caused this balance change
+    @Column(name = "entity_id", nullable = false)
     private Long entityId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "entity_type", nullable = false)
     private EntityType entityType;
 
-    @Column(name = "payment_method", length = 50)
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentType paymentMethod;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

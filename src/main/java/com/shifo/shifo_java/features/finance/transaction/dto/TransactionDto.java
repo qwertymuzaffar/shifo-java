@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.finance.transaction.dto;
 
+import com.shifo.shifo_java.features.payment.model.PaymentType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class TransactionDto {
 
     private Long id;
     private String type;
-    private String paymentMethod;
+    private PaymentType paymentMethod;
     private BigDecimal amount;
 
     private String category;
