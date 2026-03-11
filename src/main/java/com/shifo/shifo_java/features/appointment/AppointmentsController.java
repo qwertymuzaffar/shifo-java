@@ -5,6 +5,7 @@ import com.shifo.shifo_java.features.appointment.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +28,7 @@ public class AppointmentsController {
     private final CreateBatchAppointmentsService createBatchAppointmentsService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('appointment.create')")
     public ResponseEntity<CreateAppointmentResultDto> create(
             @RequestBody @Valid CreateAppointmentDto dto
     ) {
@@ -37,11 +39,13 @@ public class AppointmentsController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('appointment.view')")
     public ResponseEntity<List<AppointmentDto>> findAll(@ModelAttribute FilterAppointmentDto filter) {
         return ResponseEntity.ok(appointmentService.findAll(filter));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('appointment.view')")
     public ResponseEntity<AppointmentDetailsDto> findOne(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.findOne(id));
     }

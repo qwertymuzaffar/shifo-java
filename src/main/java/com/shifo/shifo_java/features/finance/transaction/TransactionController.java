@@ -6,16 +6,17 @@ import com.shifo.shifo_java.features.finance.transaction.dto.FilterTransactionDt
 import com.shifo.shifo_java.features.finance.transaction.dto.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
+@Tag(name = "Transactions")
 public class TransactionController {
 
     private final TransactionService transactionService;

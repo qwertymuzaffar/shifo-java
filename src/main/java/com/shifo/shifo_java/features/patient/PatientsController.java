@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,6 +34,7 @@ public class PatientsController {
             @ApiResponse(responseCode = "201", description = "Пациент успешно создан"),
             @ApiResponse(responseCode = "400", description = "Неверные данные")
     })
+    @PreAuthorize("hasAuthority('patient.create')")
     public ResponseEntity<Patient> create(@Valid @RequestBody CreatePatientDto createPatientDto) {
         Patient patient = patientsService.create(createPatientDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient);
@@ -43,6 +45,7 @@ public class PatientsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список пациентов с пагинацией")
     })
+    @PreAuthorize("hasAuthority('patient.view')")
     public ResponseEntity<PagedResponseDto<PatientDto>> findAll(@Valid @ModelAttribute FilterPatientDto filterDto) {
         PagedResponseDto<PatientDto> patients = patientsService.findAll(filterDto);
         return ResponseEntity.ok(patients);
@@ -53,6 +56,7 @@ public class PatientsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список пациентов с пагинацией")
     })
+    @PreAuthorize("hasAuthority('patient.view')")
     public ResponseEntity<PagedResponseDto<PatientDto>> findAllTelegram(@Valid @ModelAttribute FilterPatientDto filterDto) {
         filterDto.setSource(PatientSource.TELEGRAM);
         PagedResponseDto<PatientDto> patients = patientsService.findAll(filterDto);
@@ -73,6 +77,7 @@ public class PatientsController {
                     description = "Пациент не найден"
             )
     })
+    @PreAuthorize("hasAuthority('patient.view')")
     public ResponseEntity<PatientDto> findOne(@PathVariable Long id) {
         PatientDto patient = patientsService.findOne(id);
         return ResponseEntity.ok(patient);
@@ -90,6 +95,7 @@ public class PatientsController {
             @ApiResponse(responseCode = "400", description = "Неверные данные"),
             @ApiResponse(responseCode = "404", description = "Пациент не найден")
     })
+    @PreAuthorize("hasAuthority('patient.update')")
     public ResponseEntity<PatientDto> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdatePatientDto dto
@@ -105,6 +111,7 @@ public class PatientsController {
             @ApiResponse(responseCode = "200", description = "Пациент деактивирован"),
             @ApiResponse(responseCode = "404", description = "Пациент не найден")
     })
+    @PreAuthorize("hasAuthority('patient.delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         patientsService.deactivate(id);
         return ResponseEntity.ok().build();
@@ -122,6 +129,7 @@ public class PatientsController {
             @ApiResponse(responseCode = "400", description = "Неверный статус"),
             @ApiResponse(responseCode = "404", description = "Пациент не найден")
     })
+    @PreAuthorize("hasAuthority('patient.update')")
     public ResponseEntity<PatientDto> updateStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdatePatientStatusDto body

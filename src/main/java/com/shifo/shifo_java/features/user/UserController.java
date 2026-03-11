@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -31,6 +32,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Не авторизован"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещен")
     })
+    @PreAuthorize("hasAuthority('user.view')")
     public ResponseEntity<PagedResponseDto<UserDto>> findAll(FilterUserDto filterDto) {
         return ResponseEntity.ok(usersService.findAll(filterDto));
     }
@@ -43,6 +45,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
             @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     })
+    @PreAuthorize("hasAuthority('user.view')")
     public ResponseEntity<UserDto> findOne(
             @Parameter(description = "ID пользователя")
             @PathVariable Long id
@@ -59,6 +62,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
             @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     })
+    @PreAuthorize("hasAuthority('user.delete')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "ID пользователя")
             @PathVariable Long id

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class PaymentController {
 
     @PostMapping
     @Operation(summary = "Создать новый платеж")
+    @PreAuthorize("hasAuthority('payment.create')")
     public ResponseEntity<PaymentDto> create(@RequestBody @Valid CreatePaymentDto dto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -34,6 +36,7 @@ public class PaymentController {
 
     @GetMapping
     @Operation(summary = "Получить все платежи с возможностью фильтрации")
+    @PreAuthorize("hasAuthority('payment.view')")
     public ResponseEntity<ListWithCountDto<PaymentDto>> findAll(
             @Valid @ModelAttribute FilterPaymentDto filterDto
     ) {
@@ -65,6 +68,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "404", description = "Платеж не найден"),
             @ApiResponse(responseCode = "403", description = "Нет прав доступа")
     })
+    @PreAuthorize("hasAuthority('payment.delete')")
     public void remove(@PathVariable Long id) {
         paymentsService.remove(id);
     }

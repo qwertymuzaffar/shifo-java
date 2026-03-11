@@ -31,4 +31,12 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             """)
     Optional<User> findByIdWithRole(@Param("id") Long id);
 
+    @Query("""
+                SELECT u
+                FROM User u
+                JOIN FETCH u.role r
+                JOIN FETCH r.permissions
+                WHERE u.username = :username
+            """)
+    Optional<User> findByUsernameWithPermissions(String username);
 }
