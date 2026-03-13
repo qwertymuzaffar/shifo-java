@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.procedure.service;
 
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import com.shifo.shifo_java.features.procedure.Procedure;
 import com.shifo.shifo_java.features.procedure.ProcedureMapper;
 import com.shifo.shifo_java.features.procedure.ProcedureRepository;
@@ -141,5 +142,18 @@ class ProcedureServiceTest {
         procedureService.remove(1L);
 
         verify(procedureRepository).delete(procedure);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenProcedureNotFound() {
+
+        when(procedureRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> procedureService.findOne(1L))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Procedure");
+
+        verify(procedureRepository).findById(1L);
     }
 }
