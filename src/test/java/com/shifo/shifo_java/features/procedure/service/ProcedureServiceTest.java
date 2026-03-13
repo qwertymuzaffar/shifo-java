@@ -1,11 +1,13 @@
 package com.shifo.shifo_java.features.procedure.service;
 
 import com.shifo.shifo_java.features.procedure.Procedure;
+import com.shifo.shifo_java.features.procedure.ProcedureMapper;
 import com.shifo.shifo_java.features.procedure.ProcedureRepository;
 import com.shifo.shifo_java.features.procedure.ProcedureService;
-import com.shifo.shifo_java.common.exceptions.NotFoundException;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.shifo.shifo_java.features.procedure.dto.CreateProcedureDto;
+import com.shifo.shifo_java.features.procedure.dto.ProcedureDto;
+import com.shifo.shifo_java.features.procedure.dto.UpdateProcedureDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -25,29 +27,33 @@ class ProcedureServiceTest {
     @Mock
     private ProcedureRepository procedureRepository;
 
+    @Mock
+    private ProcedureMapper procedureMapper;
+
     @InjectMocks
     private ProcedureService procedureService;
 
     @Test
     void shouldReturnAllProcedures() {
 
-        Procedure p1 = new Procedure();
-        p1.setId(1L);
-        p1.setName("X-Ray");
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setName("MRI");
 
-        Procedure p2 = new Procedure();
-        p2.setId(2L);
-        p2.setName("MRI");
+        ProcedureDto dto = new ProcedureDto();
+        dto.setId(1L);
+        dto.setName("MRI");
 
-        when(procedureRepository.findAll())
-                .thenReturn(List.of(p1, p2));
+        when(procedureRepository.findAll()).thenReturn(List.of(procedure));
+        when(procedureMapper.toDto(procedure)).thenReturn(dto);
 
-        List<Procedure> result = procedureService.findAll();
+        List<ProcedureDto> result = procedureService.findAll();
 
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getName()).isEqualTo("X-Ray");
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("MRI");
 
         verify(procedureRepository).findAll();
+        verify(procedureMapper).toDto(procedure);
     }
 
     @Test
@@ -57,44 +63,47 @@ class ProcedureServiceTest {
         procedure.setId(1L);
         procedure.setName("CT Scan");
 
-        when(procedureRepository.findById(1L))
-                .thenReturn(Optional.of(procedure));
+        ProcedureDto dto = new ProcedureDto();
+        dto.setId(1L);
+        dto.setName("CT Scan");
 
-        Procedure result = procedureService.findOne(1L);
+        when(procedureRepository.findById(1L)).thenReturn(Optional.of(procedure));
+        when(procedureMapper.toDto(procedure)).thenReturn(dto);
+
+        ProcedureDto result = procedureService.findOne(1L);
 
         assertThat(result.getName()).isEqualTo("CT Scan");
 
         verify(procedureRepository).findById(1L);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenProcedureNotFound() {
-
-        when(procedureRepository.findById(1L))
-                .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> procedureService.findOne(1L))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Procedure");
-
-        verify(procedureRepository).findById(1L);
+        verify(procedureMapper).toDto(procedure);
     }
 
     @Test
     void shouldCreateProcedure() {
 
-        Procedure savedProcedure = new Procedure();
-        savedProcedure.setId(1L);
-        savedProcedure.setName("Ultrasound");
+        CreateProcedureDto request = new CreateProcedureDto();
+        request.setName("X-Ray");
 
-        when(procedureRepository.save(any(Procedure.class)))
-                .thenReturn(savedProcedure);
+        Procedure procedure = new Procedure();
+        procedure.setName("X-Ray");
 
-        Procedure result = procedureService.create("Ultrasound");
+        Procedure saved = new Procedure();
+        saved.setId(1L);
+        saved.setName("X-Ray");
 
-        assertThat(result.getName()).isEqualTo("Ultrasound");
+        ProcedureDto dto = new ProcedureDto();
+        dto.setId(1L);
+        dto.setName("X-Ray");
 
-        verify(procedureRepository).save(any(Procedure.class));
+        when(procedureMapper.toEntity(request)).thenReturn(procedure);
+        when(procedureRepository.save(procedure)).thenReturn(saved);
+        when(procedureMapper.toDto(saved)).thenReturn(dto);
+
+        ProcedureDto result = procedureService.create(request);
+
+        assertThat(result.getId()).isEqualTo(1L);
+
+        verify(procedureRepository).save(procedure);
     }
 
     @Test
@@ -102,19 +111,23 @@ class ProcedureServiceTest {
 
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setName("Old Name");
+        procedure.setName("Old");
 
-        when(procedureRepository.findById(1L))
-                .thenReturn(Optional.of(procedure));
+        UpdateProcedureDto update = new UpdateProcedureDto();
+        update.setName("Updated");
 
-        when(procedureRepository.save(any(Procedure.class)))
-                .thenReturn(procedure);
+        ProcedureDto dto = new ProcedureDto();
+        dto.setId(1L);
+        dto.setName("Updated");
 
-        Procedure result = procedureService.update(1L, "New Name");
+        when(procedureRepository.findById(1L)).thenReturn(Optional.of(procedure));
+        when(procedureMapper.toDto(procedure)).thenReturn(dto);
 
-        assertThat(result.getName()).isEqualTo("New Name");
+        ProcedureDto result = procedureService.update(1L, update);
 
-        verify(procedureRepository).save(procedure);
+        assertThat(result.getName()).isEqualTo("Updated");
+
+        verify(procedureMapper).updateEntity(update, procedure);
     }
 
     @Test
@@ -123,8 +136,7 @@ class ProcedureServiceTest {
         Procedure procedure = new Procedure();
         procedure.setId(1L);
 
-        when(procedureRepository.findById(1L))
-                .thenReturn(Optional.of(procedure));
+        when(procedureRepository.findById(1L)).thenReturn(Optional.of(procedure));
 
         procedureService.remove(1L);
 

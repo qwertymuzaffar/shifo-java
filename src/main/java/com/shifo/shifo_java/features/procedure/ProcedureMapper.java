@@ -1,7 +1,8 @@
 package com.shifo.shifo_java.features.procedure;
 
-import com.shifo.shifo_java.features.procedure.Procedure;
+import com.shifo.shifo_java.features.procedure.dto.CreateProcedureDto;
 import com.shifo.shifo_java.features.procedure.dto.ProcedureDto;
+import com.shifo.shifo_java.features.procedure.dto.UpdateProcedureDto;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -24,14 +25,31 @@ public class ProcedureMapper {
         dto.setDuration(procedure.getDuration());
         dto.setCost(procedure.getCost());
 
-        // Derived field (soft delete aware)
         dto.setIsActive(procedure.getDeletedAt() == null);
 
         dto.setCreatedAt(procedure.getCreatedAt());
         dto.setUpdatedAt(procedure.getUpdatedAt());
-        dto.setDeletedAt(procedure.getDeletedAt());
 
         return dto;
+    }
+
+    public Procedure toEntity(CreateProcedureDto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        Procedure procedure = new Procedure();
+        procedure.setName(dto.getName());
+
+        return procedure;
+    }
+
+    public void updateEntity(UpdateProcedureDto dto, Procedure procedure) {
+        if (dto == null) {
+            return;
+        }
+
+        procedure.setName(dto.getName());
     }
 
     public List<ProcedureDto> toDtoList(List<Procedure> procedures) {

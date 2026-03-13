@@ -1,11 +1,15 @@
 package com.shifo.shifo_java.features.procedure;
 
+import com.shifo.shifo_java.features.procedure.dto.CreateProcedureDto;
+import com.shifo.shifo_java.features.procedure.dto.ProcedureDto;
+import com.shifo.shifo_java.features.procedure.dto.UpdateProcedureDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/procedures")
@@ -16,29 +20,31 @@ public class ProcedureController {
     private final ProcedureService procedureService;
 
     @GetMapping
-    public List<Procedure> findAll() {
+    public List<ProcedureDto> findAll() {
         return procedureService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Procedure findOne(@PathVariable Long id) {
+    public ProcedureDto findOne(@PathVariable Long id) {
         return procedureService.findOne(id);
     }
 
     @PostMapping
-    public Procedure create(@RequestBody Map<String, String> body) {
-        return procedureService.create(body.get("name"));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProcedureDto create(@Valid @RequestBody CreateProcedureDto request) {
+        return procedureService.create(request);
     }
 
     @PutMapping("/{id}")
-    public Procedure update(
+    public ProcedureDto update(
             @PathVariable Long id,
-            @RequestBody Map<String, String> body
+            @Valid @RequestBody UpdateProcedureDto request
     ) {
-        return procedureService.update(id, body.get("name"));
+        return procedureService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remove(@PathVariable Long id) {
         procedureService.remove(id);
     }

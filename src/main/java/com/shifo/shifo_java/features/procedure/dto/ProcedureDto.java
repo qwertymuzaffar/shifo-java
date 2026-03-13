@@ -1,5 +1,6 @@
 package com.shifo.shifo_java.features.procedure.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ public class ProcedureDto {
 
     private Long id;
 
+    @NotBlank
     private String name;
 
     private String description;
@@ -27,7 +29,5 @@ public class ProcedureDto {
     private Instant createdAt;
 
     private Instant updatedAt;
-
-    private Instant deletedAt;
 }
 

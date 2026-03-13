@@ -1,14 +1,13 @@
 package com.shifo.shifo_java.features.procedure.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-public class CreateProcedureDto {
+public class UpdateProcedureDto {
+    Long id;
 
     @NotBlank
     String name;
