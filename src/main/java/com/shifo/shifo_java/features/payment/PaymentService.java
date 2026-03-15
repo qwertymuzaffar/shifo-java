@@ -103,8 +103,6 @@ public class PaymentService {
 
     @Transactional
     public void remove(Long id) {
-
-        // 1. Find payment with relations
         Payment payment = paymentRepository
                 .findByIdWithRelations(id)
                 .orElseThrow(() ->
@@ -115,7 +113,6 @@ public class PaymentService {
 
         balanceService.handlePaymentStatusRemoved(payment.getId());
 
-        // 3. Reverse patient balance if payment was paid
         if (payment.getStatus() == PaymentStatus.PAID) {
 
             PaymentKind kind = payment.getPaymentKind();
@@ -163,8 +160,7 @@ public class PaymentService {
             }
         }
 
-        // 4. Soft delete payment
-        payment.softDelete();   // sets deletedAt
+        payment.softDelete();
         paymentRepository.save(payment);
     }
 

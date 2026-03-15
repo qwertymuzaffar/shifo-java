@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface BalanceRepository extends JpaRepository<BalanceTransaction, Long> {
+public interface BalanceRepository extends JpaRepository<Balance, Long> {
     boolean existsByEntityTypeAndEntityId(EntityType entityType, Long entityId);
 
-    Optional<BalanceTransaction> findByEntityIdAndEntityType(
+    Optional<Balance> findByEntityIdAndEntityType(
             Long entityId,
             EntityType entityType
     );

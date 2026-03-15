@@ -30,6 +30,8 @@ public class TransactionService {
     private final SecurityUtils securityUtils;
     private final BalanceService balanceService;
 
+    private final TransactionMapper transactionMapper;
+
     public PagedResponseDto<TransactionDto> findAll(
             FilterTransactionDto filter
     ) {
@@ -62,36 +64,29 @@ public class TransactionService {
     @Transactional
     public Transaction create(CreateTransactionDto dto) {
 
-        // Validate category exists
-        TransactionCategory category = categoryRepository
-                .findById(dto.getCategoryId())
-                .orElseThrow(() ->
-                        new BadRequestException(
-                                "Category with id " + dto.getCategoryId() + " not found"
-                        )
-                );
+        TransactionCategory category = getCategoryOrThrow(dto.getCategoryId());
 
         User user = securityUtils.getCurrentUser();
 
-        // Create entity
-        Transaction transaction = Transaction.builder()
-                .type(dto.getType())
-                .paymentMethod(dto.getPaymentMethod())
-                .amount(dto.getAmount())
-                .category(category)
-                .date(dto.getDate())
-                .comment(dto.getComment())
-                .description(dto.getDescription())
-                .recipient(dto.getRecipient())
-                .notes(dto.getNotes())
-                .user(user)
-                .build();
+        Transaction transaction = transactionMapper.toEntity(dto, category, user);
 
         Transaction savedTransaction = repository.save(transaction);
 
-        // Automatically create balance record
-        balanceService.handleTransactionStatusChange(savedTransaction);
+        recordBalance(savedTransaction);
 
         return savedTransaction;
+    }
+
+    private TransactionCategory getCategoryOrThrow(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new BadRequestException(
+                                "Category with id " + categoryId + " not found"
+                        )
+                );
+    }
+
+    private void recordBalance(Transaction transaction) {
+        balanceService.recordTransaction(transaction);
     }
 }
