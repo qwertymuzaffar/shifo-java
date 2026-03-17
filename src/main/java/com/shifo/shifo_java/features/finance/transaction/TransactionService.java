@@ -62,7 +62,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public Transaction create(CreateTransactionDto dto) {
+    public TransactionDto create(CreateTransactionDto dto) {
 
         TransactionCategory category = getCategoryOrThrow(dto.getCategoryId());
 
@@ -74,7 +74,7 @@ public class TransactionService {
 
         recordBalance(savedTransaction);
 
-        return savedTransaction;
+        return transactionMapper.toDto(savedTransaction);
     }
 
     private TransactionCategory getCategoryOrThrow(Long categoryId) {

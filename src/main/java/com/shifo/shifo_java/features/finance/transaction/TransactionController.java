@@ -35,11 +35,11 @@ public class TransactionController {
     )
     @ApiResponse(responseCode = "201", description = "Транзакция успешно создана")
     @ApiResponse(responseCode = "400", description = "Неверные данные")
-    public ResponseEntity<Transaction> create(
+    public ResponseEntity<TransactionDto> create(
             @Valid @RequestBody CreateTransactionDto dto
     ) {
 
-        Transaction transaction = transactionService.create(dto);
+        TransactionDto transaction = transactionService.create(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
     }

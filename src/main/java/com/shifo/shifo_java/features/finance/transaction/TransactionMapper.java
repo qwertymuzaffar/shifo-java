@@ -1,13 +1,18 @@
 package com.shifo.shifo_java.features.finance.transaction;
 
 import com.shifo.shifo_java.features.finance.category.TransactionCategory;
+import com.shifo.shifo_java.features.finance.category.TransactionCategoryMapper;
 import com.shifo.shifo_java.features.finance.transaction.dto.CreateTransactionDto;
 import com.shifo.shifo_java.features.finance.transaction.dto.TransactionDto;
 import com.shifo.shifo_java.features.user.User;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class TransactionMapper {
+
+    private final TransactionCategoryMapper transactionCategoryMapper;
 
     public TransactionDto toDto(Transaction entity) {
         return TransactionDto.builder()
@@ -15,13 +20,13 @@ public class TransactionMapper {
                 .type(entity.getType().name().toLowerCase())
                 .paymentMethod(entity.getPaymentMethod())
                 .amount(entity.getAmount())
-                .category(entity.getCategory().getName())
+                .categoryEntity(transactionCategoryMapper.toDto(entity.getCategory()))
                 .date(entity.getDate())
                 .comment(entity.getComment())
                 .description(entity.getDescription())
                 .recipient(entity.getRecipient())
                 .notes(entity.getNotes())
-                .userId(entity.getUser().getId())
+                .user(entity.getUser())
                 .userFullName(entity.getUser().getFullName())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
