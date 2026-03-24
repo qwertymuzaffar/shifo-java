@@ -1,6 +1,6 @@
 package com.shifo.shifo_java.features.role.dto;
 
-import com.shifo.shifo_java.features.permission.Permission;
+import com.shifo.shifo_java.features.permission.dto.PermissionDto;
 import lombok.*;
 
 import java.time.Instant;
@@ -19,10 +19,9 @@ public class RoleDto {
 
     private String description;
 
-    private List<Permission> permissions;
+    private List<PermissionDto> permissions;
 
     private Instant createdAt;
 
     private Instant updatedAt;
 }
-

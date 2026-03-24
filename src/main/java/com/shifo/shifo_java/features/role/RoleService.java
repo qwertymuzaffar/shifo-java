@@ -5,7 +5,6 @@ import com.shifo.shifo_java.features.permission.PermissionRepository;
 import com.shifo.shifo_java.features.role.dto.CreateRoleDto;
 import com.shifo.shifo_java.features.role.dto.RoleDto;
 import com.shifo.shifo_java.features.role.dto.UpdateRoleDto;
-import com.shifo.shifo_java.features.permission.dto.AssignPermissionsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,48 +21,43 @@ public class RoleService {
     private final PermissionRepository permRepo;
     private final RoleMapper roleMapper;
 
-    // CREATE ROLE
-    public Role createRole(CreateRoleDto dto) {
-        Role role = new Role();
-        role.setSlug(dto.getSlug());
-        role.setName(dto.getName());
-        role.setDescription(dto.getDescription());
-        return roleRepo.save(role);
+    @Transactional
+    public RoleDto createRole(CreateRoleDto dto) {
+        validateUniqueFields(dto.getSlug(), dto.getName(), null);
+
+        Role role = roleMapper.toEntity(dto);
+        return roleMapper.toDto(roleRepo.save(role));
     }
 
-    // GET ALL ROLES
     @Transactional(readOnly = true)
-    public List<Role> getRoles() {
-        return roleRepo.findAll();
+    public List<RoleDto> getRoles() {
+        return roleRepo.findAll().stream()
+                .map(roleMapper::toDto)
+                .toList();
     }
 
-    // GET SINGLE ROLE
     @Transactional(readOnly = true)
-    public Role getRole(Long id) {
-        return roleRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Role not found"));
+    public RoleDto getRole(Long id) {
+        return roleMapper.toDto(getRoleEntity(id));
     }
 
-    // FIND BY SLUG
     @Transactional(readOnly = true)
     public Role findOneBySlug(String slug) {
-
         return roleRepo.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Role not found"));
     }
 
-    // UPDATE ROLE
-    public Role updateRole(Long id, UpdateRoleDto dto) {
-        Role role = getRole(id);
-        if (dto.getSlug() != null) role.setSlug(dto.getSlug());
-        if (dto.getName() != null) role.setName(dto.getName());
-        if (dto.getDescription() != null) role.setDescription(dto.getDescription());
-        return roleRepo.save(role);
+    @Transactional
+    public RoleDto updateRole(Long id, UpdateRoleDto dto) {
+        Role role = getRoleEntity(id);
+        validateUniqueFields(dto.getSlug(), dto.getName(), id);
+
+        roleMapper.updateEntity(dto, role);
+        return roleMapper.toDto(roleRepo.save(role));
     }
 
-    // DELETE ROLE
+    @Transactional
     public void deleteRole(Long id) {
         if (!roleRepo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
@@ -71,39 +65,49 @@ public class RoleService {
         roleRepo.deleteById(id);
     }
 
-    // ASSIGN PERMISSIONS TO ROLE
-    @Transactional
-    public Role assignPermissionsToRole(Long roleId, AssignPermissionsDto dto) {
-
-        Role role = roleRepo.findById(roleId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Role not found"));
-
-        List<Permission> perms =
-                permRepo.findAllById(dto.getPermissionIds());
-
-        role.setPermissions(perms);
-        return roleRepo.save(role);
-    }
-
     @Transactional
     public RoleDto assignPermissionsToRole(Long roleId, List<Long> permissionIds) {
-
-        Role role = roleRepo.findByIdWithPermissions(roleId)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = getRoleEntityWithPermissions(roleId);
 
         List<Permission> permissions = permRepo.findAllById(permissionIds);
 
         if (permissions.size() != permissionIds.size()) {
-            throw new IllegalArgumentException("Some permissions not found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some permissions not found");
         }
 
         role.getPermissions().clear();
         role.getPermissions().addAll(permissions);
 
-        // No save() needed — transaction commit will sync join table
-
         return roleMapper.toDto(role);
     }
-}
 
+    private Role getRoleEntity(Long id) {
+        return roleRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Role not found"));
+    }
+
+    private Role getRoleEntityWithPermissions(Long id) {
+        return roleRepo.findByIdWithPermissions(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Role not found"));
+    }
+
+    private void validateUniqueFields(String slug, String name, Long currentRoleId) {
+        if (slug != null) {
+            roleRepo.findBySlug(slug)
+                    .filter(role -> !role.getId().equals(currentRoleId))
+                    .ifPresent(role -> {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Role slug already exists");
+                    });
+        }
+
+        if (name != null) {
+            roleRepo.findByName(name)
+                    .filter(role -> !role.getId().equals(currentRoleId))
+                    .ifPresent(role -> {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Role name already exists");
+                    });
+        }
+    }
+}
