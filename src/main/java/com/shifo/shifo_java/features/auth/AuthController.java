@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,22 +24,27 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
-    public ResponseEntity<ApiResponse<Object>> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<Void>> register(
+            @Valid @RequestBody RegisterRequest request
+    ) {
         authService.register(request);
-        return ResponseEntity.ok(ApiResponse.success("User registered successfully", null));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("User registered successfully", null));
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login user")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
         LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success("Login successful", response));
     }
 
     @GetMapping("/profile")
     @Operation(summary = "Get current user profile")
-    public ResponseEntity<UserProfileResponse> getProfile() {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile() {
         UserProfileResponse profile = authService.getProfile();
-        return ResponseEntity.ok(profile);
+        return ResponseEntity.ok(ApiResponse.success("Profile fetched successfully", profile));
     }
 }
