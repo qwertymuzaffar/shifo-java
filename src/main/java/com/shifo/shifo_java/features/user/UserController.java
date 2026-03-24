@@ -1,7 +1,6 @@
 package com.shifo.shifo_java.features.user;
 
 import com.shifo.shifo_java.common.dto.PagedResponseDto;
-import com.shifo.shifo_java.common.dto.PaginationDto;
 import com.shifo.shifo_java.features.user.dto.FilterUserDto;
 import com.shifo.shifo_java.features.user.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/users")

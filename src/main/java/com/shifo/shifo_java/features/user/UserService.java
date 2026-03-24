@@ -25,59 +25,13 @@ public class UserService {
 
     @Transactional
     public UserDto update(Long id, UpdateUserDto dto) {
+        User user = getUserOrThrow(id);
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User not found"
-                ));
+        updateEmailIfChanged(dto, user);
+        updatePasswordIfProvided(dto, user);
+        userMapper.updateEntity(dto, user);
 
-        // -------------------------------------------------
-        // 1️⃣ Validate Email Change (only if modified)
-        // -------------------------------------------------
-        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
-
-            boolean exists = userRepository.findByEmail(dto.getEmail()).isPresent();
-
-            if (exists) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "auth.errors.emailAlreadyInUse"
-                );
-            }
-
-            user.setEmail(dto.getEmail());
-        }
-
-        // -------------------------------------------------
-        // 2️⃣ Hash Password if Provided
-        // -------------------------------------------------
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            String hashed = passwordEncoder.encode(dto.getPassword());
-            user.setPassword(hashed);
-        }
-
-        // -------------------------------------------------
-        // 3️⃣ Partial Update Other Fields (PATCH behavior)
-        // -------------------------------------------------
-        if (dto.getFirstName() != null) {
-            user.setFirstName(dto.getFirstName());
-        }
-
-        if (dto.getLastName() != null) {
-            user.setLastName(dto.getLastName());
-        }
-
-        if (dto.getPhone() != null) {
-            user.setPhone(dto.getPhone());
-        }
-
-        if (dto.getIsActive() != null) {
-            user.setIsActive(dto.getIsActive());
-        }
-
-        // No explicit save required, but OK to keep:
         User saved = userRepository.save(user);
-
         return userMapper.mapUserToDto(saved);
     }
 
@@ -122,5 +76,36 @@ public class UserService {
                 );
 
         return userMapper.mapUserToDto(user);
+    }
+
+    private User getUserOrThrow(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"
+                ));
+    }
+
+    private void updateEmailIfChanged(UpdateUserDto dto, User user) {
+        if (dto.getEmail() == null || dto.getEmail().equals(user.getEmail())) {
+            return;
+        }
+
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email already in use"
+            );
+        }
+
+        user.setEmail(dto.getEmail());
+    }
+
+    private void updatePasswordIfProvided(UpdateUserDto dto, User user) {
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            return;
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
     }
 }

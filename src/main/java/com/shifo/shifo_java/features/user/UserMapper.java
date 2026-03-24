@@ -27,6 +27,24 @@ public class UserMapper {
         return dto;
     }
 
+    public void updateEntity(UpdateUserDto dto, User user) {
+        if (dto.getFirstName() != null) {
+            user.setFirstName(dto.getFirstName());
+        }
+
+        if (dto.getLastName() != null) {
+            user.setLastName(dto.getLastName());
+        }
+
+        if (dto.getPhone() != null) {
+            user.setPhone(dto.getPhone());
+        }
+
+        if (dto.getIsActive() != null) {
+            user.setIsActive(dto.getIsActive());
+        }
+    }
+
     public UpdateUserDto fromDoctorUpdate(UpdateDoctorDto dto) {
 
         UpdateUserDto userDto = new UpdateUserDto();
