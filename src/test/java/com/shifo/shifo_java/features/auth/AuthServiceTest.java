@@ -61,11 +61,19 @@ class AuthServiceTest {
         mappedUser.setEmail("john@example.com");
         authMapper.userFromRequest = mappedUser;
 
-        authService.register(request);
+        UserProfileResponse expectedProfile = UserProfileResponse.builder()
+                .username("john")
+                .email("john@example.com")
+                .build();
+        authMapper.profileResponse = expectedProfile;
+
+        UserProfileResponse response = authService.register(request);
 
         assertThat(authValidator.validatedRequest).isSameAs(request);
         assertThat(authMapper.toEntityRequest).isSameAs(request);
         assertThat(repositoryState.savedUser).isSameAs(mappedUser);
+        assertThat(authMapper.profileUser).isSameAs(mappedUser);
+        assertThat(response).isSameAs(expectedProfile);
     }
 
     @Test

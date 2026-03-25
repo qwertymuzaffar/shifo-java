@@ -42,6 +42,10 @@ class AuthControllerTest {
         request.setEmail("john@example.com");
         request.setPassword("secret123");
         request.setRoleId(1L);
+        authService.registerResponse = UserProfileResponse.builder()
+                .username("john")
+                .email("john@example.com")
+                .build();
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -49,7 +53,8 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("User registered successfully"))
-                .andExpect(jsonPath("$.data").doesNotExist());
+                .andExpect(jsonPath("$.data.username").value("john"))
+                .andExpect(jsonPath("$.data.email").value("john@example.com"));
     }
 
     @Test
@@ -94,11 +99,9 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Login successful"))
-                .andExpect(jsonPath("$.data.access_token").value("jwt-token"))
-                .andExpect(jsonPath("$.data.user.username").value("john"))
-                .andExpect(jsonPath("$.data.user.role.slug").value("admin"));
+                .andExpect(jsonPath("$.access_token").value("jwt-token"))
+                .andExpect(jsonPath("$.user.username").value("john"))
+                .andExpect(jsonPath("$.user.role.slug").value("admin"));
     }
 
     @Test
@@ -119,16 +122,15 @@ class AuthControllerTest {
 
         mockMvc.perform(get("/api/auth/profile"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Profile fetched successfully"))
-                .andExpect(jsonPath("$.data.username").value("alice"))
-                .andExpect(jsonPath("$.data.role").value("manager"))
-                .andExpect(jsonPath("$.data.permissions[0]").value("users.read"))
-                .andExpect(jsonPath("$.data.permissions[1]").value("users.write"));
+                .andExpect(jsonPath("$.username").value("alice"))
+                .andExpect(jsonPath("$.role").value("manager"))
+                .andExpect(jsonPath("$.permissions[0]").value("users.read"))
+                .andExpect(jsonPath("$.permissions[1]").value("users.write"));
     }
 
     private static final class FakeAuthService extends AuthService {
 
+        private UserProfileResponse registerResponse;
         private LoginResponse loginResponse;
         private UserProfileResponse profileResponse;
 
@@ -137,7 +139,8 @@ class AuthControllerTest {
         }
 
         @Override
-        public void register(RegisterRequest request) {
+        public UserProfileResponse register(RegisterRequest request) {
+            return registerResponse;
         }
 
         @Override

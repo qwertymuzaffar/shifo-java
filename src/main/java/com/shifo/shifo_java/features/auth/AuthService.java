@@ -27,11 +27,11 @@ public class AuthService {
     private final SecurityUtils securityUtils;
 
     @Transactional
-    public void register(RegisterRequest request) {
+    public UserProfileResponse register(RegisterRequest request) {
         authValidator.validateRegister(request);
 
         User user = authMapper.toEntity(request);
-        userRepository.save(user);
+        return authMapper.toProfile(userRepository.save(user));
     }
 
     @Transactional

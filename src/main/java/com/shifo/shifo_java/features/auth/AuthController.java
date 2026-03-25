@@ -24,27 +24,25 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
-    public ResponseEntity<ApiResponse<Void>> register(
+    public ResponseEntity<ApiResponse<UserProfileResponse>> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        authService.register(request);
+        UserProfileResponse profile = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("User registered successfully", null));
+                .body(ApiResponse.success("User registered successfully", profile));
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login user")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(
-            @Valid @RequestBody LoginRequest request
-    ) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/profile")
     @Operation(summary = "Get current user profile")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile() {
+    public ResponseEntity<UserProfileResponse> getProfile() {
         UserProfileResponse profile = authService.getProfile();
-        return ResponseEntity.ok(ApiResponse.success("Profile fetched successfully", profile));
+        return ResponseEntity.ok(profile);
     }
 }
