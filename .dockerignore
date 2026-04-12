@@ -1,0 +1,7 @@
+.git
+.idea
+target
+Dockerfile
+compose.yml
+README.md
+.DS_Store
