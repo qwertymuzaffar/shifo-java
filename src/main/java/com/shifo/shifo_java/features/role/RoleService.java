@@ -5,6 +5,7 @@ import com.shifo.shifo_java.features.permission.PermissionRepository;
 import com.shifo.shifo_java.features.role.dto.CreateRoleDto;
 import com.shifo.shifo_java.features.role.dto.RoleDto;
 import com.shifo.shifo_java.features.role.dto.UpdateRoleDto;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Role findOneBySlug(String slug) {
         return roleRepo.findBySlug(slug)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Role not found"));
+                .orElseThrow(() -> new NotFoundException("Role not found"));
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class RoleService {
     @Transactional
     public void deleteRole(Long id) {
         if (!roleRepo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
+            throw new NotFoundException("Role not found");
         }
         roleRepo.deleteById(id);
     }
@@ -83,14 +83,12 @@ public class RoleService {
 
     private Role getRoleEntity(Long id) {
         return roleRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Role not found"));
+                .orElseThrow(() -> new NotFoundException("Role not found"));
     }
 
     private Role getRoleEntityWithPermissions(Long id) {
         return roleRepo.findByIdWithPermissions(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Role not found"));
+                .orElseThrow(() -> new NotFoundException("Role not found"));
     }
 
     private void validateUniqueFields(String slug, String name, Long currentRoleId) {

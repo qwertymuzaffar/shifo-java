@@ -1,5 +1,7 @@
 package com.shifo.shifo_java.config;
 
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,5 +22,11 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", ex.getMessage()));
     }
 }

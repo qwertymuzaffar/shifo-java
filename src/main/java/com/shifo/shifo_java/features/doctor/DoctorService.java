@@ -22,11 +22,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -129,10 +128,7 @@ public class DoctorService {
     public DoctorDto findOne(Long id) {
 
         Doctor doctor = doctorRepository.findActiveByIdWithRelations(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "doctors.errors.notFound"
-                ));
+                .orElseThrow(() -> new NotFoundException("doctors.errors.notFound"));
 
         return doctorMapper.toDto(doctor);
     }
@@ -141,10 +137,7 @@ public class DoctorService {
     public void remove(Long id) {
 
         Doctor doctor = doctorRepository.findActiveByIdWithUser(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "doctors.errors.notFound"
-                ));
+                .orElseThrow(() -> new NotFoundException("doctors.errors.notFound"));
 
         // Cancel appointments
         appointmentRepository.cancelFutureAppointments(
@@ -164,9 +157,7 @@ public class DoctorService {
     public DoctorDto update(Long id, UpdateDoctorDto dto) {
 
         Doctor doctor = doctorRepository.findActiveByIdWithUser(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Doctor not found"
-                ));
+                .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
         // ---------------- USER UPDATE ----------------
         if (userMapper.hasUserChanges(dto)) {

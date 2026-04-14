@@ -6,6 +6,7 @@ import com.shifo.shifo_java.features.user.dto.UpdateUserDto;
 import com.shifo.shifo_java.features.user.dto.UserDto;
 import com.shifo.shifo_java.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,10 +42,7 @@ public class UserService {
         int affected = userRepository.softDelete(id);
 
         if (affected == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "users.errors.notFound"
-            );
+            throw new NotFoundException("users.errors.notFound");
         }
     }
 
@@ -69,21 +67,14 @@ public class UserService {
     public UserDto findOne(Long id) {
         User user = userRepository.findByIdWithRole(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "User not found with id = " + id
-                        )
-                );
+                        new NotFoundException("User not found with id = " + id));
 
         return userMapper.mapUserToDto(user);
     }
 
     private User getUserOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found"
-                ));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     private void updateEmailIfChanged(UpdateUserDto dto, User user) {

@@ -2,7 +2,7 @@ package com.shifo.shifo_java.features.patient;
 
 import com.shifo.shifo_java.common.dto.PagedResponseDto;
 import com.shifo.shifo_java.common.enums.SortOrder;
-import com.shifo.shifo_java.common.exceptions.ResourceNotFoundException;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import com.shifo.shifo_java.features.patient.dto.CreatePatientDto;
 import com.shifo.shifo_java.features.patient.dto.FilterPatientDto;
 import com.shifo.shifo_java.features.patient.dto.PatientDto;
@@ -147,7 +147,7 @@ public class PatientsService {
 
     public PatientDto findOne(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new NotFoundException(
                         "Пациент не найден: id=" + id
                 ));
 
@@ -158,7 +158,7 @@ public class PatientsService {
     public PatientDto update(Long id, UpdatePatientDto dto) {
 
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new NotFoundException(
                         "Пациент не найден: id=" + id
                 ));
 
@@ -171,7 +171,7 @@ public class PatientsService {
     public void deactivate(Long id) {
 
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new NotFoundException(
                         "Пациент не найден: id=" + id
                 ));
 
@@ -188,7 +188,7 @@ public class PatientsService {
         }
 
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new NotFoundException(
                         "Пациент не найден: id=" + id
                 ));
 

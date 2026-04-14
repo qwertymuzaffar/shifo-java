@@ -5,6 +5,7 @@ import com.shifo.shifo_java.features.role.Role;
 import com.shifo.shifo_java.features.user.dto.FilterUserDto;
 import com.shifo.shifo_java.features.user.dto.UpdateUserDto;
 import com.shifo.shifo_java.features.user.dto.UserDto;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import com.shifo.shifo_java.features.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,12 +135,8 @@ class UserServiceTest {
         repositoryState.softDeleteResult = 0;
 
         assertThatThrownBy(() -> userService.remove(7L))
-                .isInstanceOf(ResponseStatusException.class)
-                .satisfies(exception -> {
-                    ResponseStatusException responseException = (ResponseStatusException) exception;
-                    assertThat(responseException.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-                    assertThat(responseException.getReason()).isEqualTo("users.errors.notFound");
-                });
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("users.errors.notFound");
     }
 
     @Test

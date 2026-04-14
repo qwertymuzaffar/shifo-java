@@ -18,10 +18,9 @@ import com.shifo.shifo_java.features.payment.repository.PaymentQueryRepository;
 import com.shifo.shifo_java.features.payment.repository.PaymentRepository;
 import com.shifo.shifo_java.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -106,10 +105,7 @@ public class PaymentService {
         Payment payment = paymentRepository
                 .findByIdWithRelations(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Оплата с id " + id + " не найден"
-                        ));
+                        new NotFoundException("Оплата с id " + id + " не найден"));
 
         balanceService.handlePaymentStatusRemoved(payment.getId());
 

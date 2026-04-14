@@ -5,6 +5,7 @@ import com.shifo.shifo_java.features.finance.category.dto.CreateTransactionCateg
 import com.shifo.shifo_java.features.finance.category.dto.FilterTransactionCategoryDto;
 import com.shifo.shifo_java.features.finance.category.dto.TransactionCategoryDto;
 import com.shifo.shifo_java.features.finance.category.repository.TransactionCategoryRepository;
+import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -81,8 +82,7 @@ public class TransactionCategoryService {
     public void remove(Long id) {
 
         TransactionCategory category = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Категория не найдена"));
+                .orElseThrow(() -> new NotFoundException("Категория не найдена"));
 
         long transactionCount = repository.countTransactionsByCategoryId(id);
 
