@@ -2,6 +2,7 @@ package com.shifo.shifo_java.service;
 
 import com.shifo.shifo_java.features.user.User;
 import com.shifo.shifo_java.features.user.repository.UserRepository;
+import com.shifo.shifo_java.security.UserPrincipal;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +34,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                         .map(GrantedAuthority.class::cast)
                         .toList();
 
-        return new org.springframework.security.core.userdetails.User(
+        return new UserPrincipal(
+                user.getId(),
                 user.getUsername(),
                 user.getPassword(),
                 authorities

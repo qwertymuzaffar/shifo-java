@@ -15,19 +15,11 @@ public class SecurityUtils {
     private final UserRepository userRepository;
 
     public User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
+        Long id = getCurrentUserId();
+        if (id == null) {
             return null;
         }
-
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            String username = ((UserDetails) principal).getUsername();
-            return userRepository.findByUsername(username).orElse(null);
-        }
-
-        return null;
+        return userRepository.findById(id).orElse(null);
     }
 
     public String getCurrentUsername() {
@@ -46,8 +38,18 @@ public class SecurityUtils {
     }
 
     public Long getCurrentUserId() {
-        User user = getCurrentUser();
-        return user != null ? user.getId() : null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserPrincipal) {
+            return ((UserPrincipal) principal).getId();
+        }
+
+        return null;
     }
 }
 
