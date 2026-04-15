@@ -1,8 +1,6 @@
 package com.shifo.shifo_java.features.payment;
 
 import com.shifo.shifo_java.features.balance.BalanceService;
-import com.shifo.shifo_java.features.patient.Patient;
-import com.shifo.shifo_java.features.patient.PatientRepository;
 import com.shifo.shifo_java.features.payment.dto.CreatePaymentDto;
 import com.shifo.shifo_java.features.payment.dto.FilterPaymentDto;
 import com.shifo.shifo_java.features.payment.dto.ListWithCountDto;
@@ -22,8 +20,6 @@ import com.shifo.shifo_java.common.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +30,6 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final PatientRepository patientRepository;
     private final PaymentQueryRepository paymentQueryRepository;
 
     private final BalanceService balanceService;
@@ -108,63 +103,9 @@ public class PaymentService {
                         new NotFoundException("Оплата с id " + id + " не найден"));
 
         balanceService.handlePaymentStatusRemoved(payment.getId());
-
-        if (payment.getStatus() == PaymentStatus.PAID) {
-
-            PaymentKind kind = payment.getPaymentKind();
-
-            Long targetPatientId =
-                    payment.getPatientId() != null
-                            ? payment.getPatientId()
-                            : payment.getAppointment() != null
-                            ? payment.getAppointment().getPatient().getId()
-                            : null;
-
-            if (targetPatientId != null && affectsBalance(kind)) {
-
-                Patient patient = patientRepository
-                        .findById(targetPatientId)
-                        .orElse(null);
-
-                if (patient != null) {
-
-                    BigDecimal currentBalance = patient.getBalance() != null
-                            ? patient.getBalance()
-                            : BigDecimal.ZERO;
-
-                    BigDecimal amount = payment.getAmount();
-
-                    BigDecimal delta;
-
-                    // reverse effect
-                    if (kind == PaymentKind.DEBT || kind == PaymentKind.BALANCE_DEDUCTION) {
-                        // was subtracted → add back
-                        delta = amount;
-                    } else {
-                        // was added → subtract
-                        delta = amount.negate();
-                    }
-
-                    BigDecimal newBalance = currentBalance
-                            .add(delta)
-                            .setScale(2, RoundingMode.HALF_UP);
-
-                    patient.setBalance(newBalance);
-
-                    patientRepository.save(patient);
-                }
-            }
-        }
+        balanceService.reversePayment(payment);
 
         payment.softDelete();
         paymentRepository.save(payment);
-    }
-
-
-    private boolean affectsBalance(PaymentKind kind) {
-        return kind == PaymentKind.DEBT
-                || kind == PaymentKind.PREPAYMENT
-                || kind == PaymentKind.DEBT_PAYMENT
-                || kind == PaymentKind.BALANCE_DEDUCTION;
     }
 }
