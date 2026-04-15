@@ -10,13 +10,9 @@ import com.shifo.shifo_java.features.patient.dto.UpdatePatientDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -111,38 +107,6 @@ public class PatientsService {
         boolean asc = filter.getOrder() == SortOrder.ASC;
 
         query.orderBy(asc ? cb.asc(root.get(field)) : cb.desc(root.get(field)));
-    }
-
-    private List<Predicate> buildPredicates(
-            CriteriaBuilder cb,
-            Root<Patient> root,
-            String search,
-            LocalDate birthDateFrom,
-            LocalDate birthDateTo
-    ) {
-        List<Predicate> predicates = new ArrayList<>();
-
-        // Default filter: only active patients
-        predicates.add(cb.equal(root.get("status"), PatientStatus.ACTIVE));
-
-        if (StringUtils.hasText(search)) {
-            String pattern = "%" + search.toLowerCase() + "%";
-
-            predicates.add(cb.or(
-                    cb.like(cb.lower(root.get("fullName")), pattern),
-                    cb.like(cb.lower(root.get("phone")), pattern)
-            ));
-        }
-
-        if (birthDateFrom != null && birthDateTo != null) {
-            predicates.add(cb.between(root.get("birthDate"), birthDateFrom, birthDateTo));
-        } else if (birthDateFrom != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("birthDate"), birthDateFrom));
-        } else if (birthDateTo != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("birthDate"), birthDateTo));
-        }
-
-        return predicates;
     }
 
     public PatientDto findOne(Long id) {
