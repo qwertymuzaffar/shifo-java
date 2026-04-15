@@ -5,18 +5,23 @@ import com.shifo.shifo_java.features.auth.dto.LoginResponse;
 import com.shifo.shifo_java.features.auth.dto.RegisterRequest;
 import com.shifo.shifo_java.features.auth.dto.UserProfileResponse;
 import com.shifo.shifo_java.features.user.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class AuthMapper {
+
+    private final PasswordEncoder passwordEncoder;
 
     public User toEntity(RegisterRequest request) {
         return User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword()) // encode in service if needed
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
     }
 

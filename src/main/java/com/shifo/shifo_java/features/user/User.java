@@ -6,13 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -23,8 +19,6 @@ import java.time.LocalDateTime;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 public class User {
-
-    private static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -87,23 +81,6 @@ public class User {
         return (first + " " + last).trim();
     }
 
-    // -------------------------
-    // Password hashing (BeforeInsert equivalent)
-    // -------------------------
-    @PrePersist
-    @PreUpdate
-    private void hashPassword() {
-        if (password != null && !password.startsWith("$2a$")) {
-            this.password = PASSWORD_ENCODER.encode(this.password);
-        }
-    }
-
-    // -------------------------
-    // Password validation helper
-    // -------------------------
-    public boolean validatePassword(String rawPassword) {
-        return PASSWORD_ENCODER.matches(rawPassword, this.password);
-    }
 }
 
 

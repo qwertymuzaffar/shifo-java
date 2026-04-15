@@ -188,6 +188,10 @@ class AuthServiceTest {
     }
 
     private static final class RecordingAuthMapper extends AuthMapper {
+        private RecordingAuthMapper() {
+            super(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());
+        }
+
         private RegisterRequest toEntityRequest;
         private User userFromRequest;
         private User loginUser;

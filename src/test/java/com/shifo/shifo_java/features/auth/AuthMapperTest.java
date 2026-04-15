@@ -9,6 +9,8 @@ import com.shifo.shifo_java.features.role.Role;
 import com.shifo.shifo_java.features.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,10 +21,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class AuthMapperTest {
 
     private AuthMapper authMapper;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @BeforeEach
     void setUp() {
-        authMapper = new AuthMapper();
+        authMapper = new AuthMapper(passwordEncoder);
     }
 
     @Test
@@ -40,7 +43,7 @@ class AuthMapperTest {
 
         assertThat(user.getUsername()).isEqualTo("john");
         assertThat(user.getEmail()).isEqualTo("john@example.com");
-        assertThat(user.getPassword()).isEqualTo("secret123");
+        assertThat(passwordEncoder.matches("secret123", user.getPassword())).isTrue();
         assertThat(user.getPhone()).isNull();
         assertThat(user.getFirstName()).isNull();
         assertThat(user.getLastName()).isNull();
