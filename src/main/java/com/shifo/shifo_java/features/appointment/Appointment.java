@@ -25,6 +25,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE appointments SET deleted_at = now() WHERE id=?")
+@Where(clause = "deleted_at IS NULL")
 @Table(name = "appointments", indexes = {
         @Index(name = "idx_appointments_date", columnList = "date"),
         @Index(name = "idx_appointments_status", columnList = "status"),
@@ -64,8 +66,6 @@ public class Appointment {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    @SQLDelete(sql = "UPDATE appointments SET deleted_at = now() WHERE id=?")
-    @Where(clause = "deleted_at IS NULL")
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
