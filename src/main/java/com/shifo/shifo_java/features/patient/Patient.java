@@ -6,7 +6,8 @@ import com.shifo.shifo_java.features.patient.enums.PatientRegistrationStatus;
 import com.shifo.shifo_java.features.patient.enums.PatientSource;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +19,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -111,4 +113,21 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Patient other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Patient(id=" + id + ")";
+    }
 }

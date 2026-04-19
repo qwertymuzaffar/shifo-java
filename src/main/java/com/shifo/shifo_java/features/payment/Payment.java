@@ -32,7 +32,8 @@ import java.time.LocalDateTime;
 )
 @SQLDelete(sql = "UPDATE payments SET deleted_at = now() WHERE id=?")
 @Where(clause = "deleted_at IS NULL")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -97,6 +98,23 @@ public class Payment {
 
     public void softDelete() {
         this.deletedAt = Instant.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Payment other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Payment(id=" + id + ")";
     }
 }
 
